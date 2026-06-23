@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Housing Bills Tracker — SANDAG / Ascent</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #F7F6F3; color: #1a1a18; font-size: 14px; line-height: 1.5; }
+
+  header {
+    background: #1D3557; color: #fff; padding: 20px 32px 16px;
+    border-bottom: 3px solid #457B9D; display: flex;
+    align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .header-sub { font-size: 12px; color: #A8C4D8; margin-top: 4px; }
+
+  .sync-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #A8C4D8; flex-shrink: 0; padding-top: 2px; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #A8C4D8; flex-shrink: 0; transition: background 0.3s; }
+  .sync-dot.syncing { background: #F4D03F; animation: pulse 1s infinite; }
+  .sync-dot.ok      { background: #58D68D; }
+  .sync-dot.error   { background: #EC7063; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .refresh-btn {
+    font-size: 11px; padding: 3px 10px; border-radius: 999px;
+    border: 0.5px solid #457B9D; background: transparent; color: #A8C4D8;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .refresh-btn:hover { background: #457B9D; color: #fff; }
+  .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .toolbar {
+    background: #fff; border-bottom: 0.5px solid #ddd; padding: 12px 32px;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 280px; }
+  .search-wrap input {
+    width: 100%; padding: 6px 10px 6px 30px; border: 0.5px solid #ccc;
+    border-radius: 6px; font-size: 13px; background: #fafafa; outline: none;
+  }
+  .search-wrap input:focus { border-color: #457B9D; background: #fff; }
+  .search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: #999; fill: none; }
+
+  .filter-group { display: flex; flex-wrap: wrap; gap: 5px; }
+  .fbtn {
+    font-size: 12px; padding: 4px 11px; border-radius: 999px;
+    border: 0.5px solid #ccc; background: #fff; color: #555;
+    cursor: pointer; transition: all 0.12s; white-space: nowrap;
+  }
+  .fbtn:hover { border-color: #457B9D; color: #1D3557; }
+  .fbtn.on { background: #1D3557; color: #fff; border-color: #1D3557; font-weight: 500; }
+  .toolbar-divider { width: 0.5px; height: 22px; background: #e0ddd7; flex-shrink: 0; }
+
+  .stats-bar { background: #fff; padding: 10px 32px; border-bottom: 0.5px solid #eee; display: flex; flex-wrap: wrap; gap: 24px; }
+  .stat { display: flex; flex-direction: column; }
+  .stat-n { font-size: 20px; font-weight: 600; color: #1D3557; line-height: 1; }
+  .stat-l { font-size: 11px; color: #888; margin-top: 2px; }
+
+  .count-bar { padding: 8px 32px; font-size: 12px; color: #888; background: #F7F6F3; border-bottom: 0.5px solid #eee; }
+  .bill-list { padding: 12px 24px 40px; }
+
+  .bill-card {
+    background: #fff; border: 0.5px solid #e0ddd7; border-radius: 8px;
+    margin-bottom: 6px; padding: 12px 14px;
+    display: grid; grid-template-columns: 80px 1fr auto; gap: 10px 14px; align-items: start;
+  }
+  .bill-card.is-inactive { opacity: 0.6; }
+  .bill-card.not-sandag  { border-left: 3px solid #c8a45a; }
+  .bill-card.live-changed { border-color: #58D68D; }
+
+  .bill-id   { font-weight: 600; font-size: 13px; color: #1D3557; white-space: nowrap; padding-top: 2px; }
+  .bill-main { display: flex; flex-direction: column; gap: 5px; }
+  .bill-top  { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .bill-subj { font-size: 13px; font-weight: 500; color: #1a1a18; }
+  .bill-subj.inactive-subj { text-decoration: line-through; color: #999; }
+  .bill-desc { font-size: 12.5px; color: #555; line-height: 1.6; }
+  .bill-desc.no-desc { color: #aaa; font-style: italic; }
+
+  .live-row  { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: 12px; }
+  .live-pill { font-size: 10px; background: #E1F5EE; color: #085041; padding: 1px 6px; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; flex-shrink: 0; }
+  .live-stage { color: #1D3557; font-weight: 500; }
+  .live-date  { color: #999; font-size: 11px; }
+  .live-link  { font-size: 11px; color: #457B9D; text-decoration: none; }
+  .live-link:hover { text-decoration: underline; }
+
+  .bill-badges { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 999px; white-space: nowrap; line-height: 1.6; }
+  .b-senate    { background: #EEEDFE; color: #3C3489; }
+  .b-assembly  { background: #EAF3DE; color: #3B6D11; }
+  .b-floor     { background: #D6EAF8; color: #1a5276; }
+  .b-committee { background: #F1EFE8; color: #5F5E5A; }
+  .b-pending   { background: #FEF9E7; color: #7D6608; }
+  .b-inactive  { background: #FDEDEC; color: #922B21; }
+  .b-passed    { background: #D5F5E3; color: #1E8449; }
+  .b-notsandag { background: #FDF3E3; color: #7D5A1E; }
+  .b-signed    { background: #D5F5E3; color: #145A32; }
+  .b-vetoed    { background: #FDEDEC; color: #7B241C; }
+  .b-engrossed { background: #D6EAF8; color: #154360; }
+
+  .cat { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 4px; white-space: nowrap; line-height: 1.7; font-weight: 500; }
+  .cat-sb79       { background: #E1F5EE; color: #085041; }
+  .cat-density    { background: #EEEDFE; color: #3C3489; }
+  .cat-streamline { background: #E6F1FB; color: #0C447C; }
+  .cat-adu        { background: #FEF9E7; color: #7D4E0A; }
+  .cat-rhna       { background: #F0EAF8; color: #5A2D82; }
+  .cat-funding    { background: #D5F5E3; color: #1E6B3C; }
+  .cat-other      { background: #F1EFE8; color: #4A4840; }
+  .cat-unknown    { background: #F7F6F3; color: #999; border: 0.5px solid #ddd; }
+
+  /* ── Hearing indicator ── */
+  .hearing-row { display: flex; align-items: center; gap: 6px; font-size: 12px; flex-wrap: wrap; }
+  .hearing-pill { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; flex-shrink: 0; }
+  .hearing-pill.soon   { background: #FEF3C7; color: #92400E; }
+  .hearing-pill.today  { background: #FEE2E2; color: #991B1B; }
+  .hearing-pill.future { background: #EDE9FE; color: #4C1D95; }
+  .hearing-date { color: #555; font-weight: 500; }
+  .hearing-cmte { color: #888; font-size: 11px; }
+
+  /* ── Comments ── */
+  .comments-section { margin-top: 6px; }
+  .comments-log { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  .comment-entry {
+    background: #FFFBEB; border-left: 3px solid #F59E0B;
+    border-radius: 0 4px 4px 0; padding: 6px 10px;
+  }
+  .comment-meta {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: #999; margin-bottom: 3px;
+  }
+  .comment-author { font-weight: 600; color: #1D3557; }
+  .comment-ts { color: #bbb; }
+  .comment-delete {
+    margin-left: auto; font-size: 11px; color: #ddd; background: none;
+    border: none; cursor: pointer; padding: 0; line-height: 1;
+  }
+  .comment-delete:hover { color: #e53e3e; }
+  .comment-text { font-size: 12.5px; color: #444; line-height: 1.55; white-space: pre-wrap; }
+  .comment-composer { display: flex; flex-direction: column; gap: 5px; }
+  .comment-add-btn {
+    font-size: 12px; color: #bbb; background: none; border: 0.5px solid #e0ddd7;
+    border-radius: 4px; padding: 5px 10px; cursor: pointer; text-align: left;
+    font-family: inherit; transition: all 0.12s;
+  }
+  .comment-add-btn:hover { border-color: #F59E0B; color: #92400E; background: #FFFBEB; }
+  .comment-textarea {
+    width: 100%; font-size: 12.5px; font-family: inherit;
+    border: 0.5px solid #457B9D; border-radius: 4px;
+    padding: 6px 8px; resize: vertical; min-height: 56px;
+    outline: none; background: #fff; line-height: 1.55;
+  }
+  .comment-actions { display: flex; gap: 6px; align-items: center; }
+  .comment-post, .comment-cancel-btn {
+    font-size: 11px; padding: 4px 12px; border-radius: 4px;
+    border: none; cursor: pointer; font-family: inherit;
+  }
+  .comment-post       { background: #1D3557; color: #fff; }
+  .comment-post:hover { background: #457B9D; }
+  .comment-cancel-btn { background: #f0ede8; color: #555; }
+  .note-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; margin-left: 4px; vertical-align: middle; }
+
+  .no-results { padding: 40px 32px; text-align: center; color: #999; font-size: 14px; }
+
+  @media (max-width: 640px) {
+    header, .toolbar, .stats-bar, .count-bar, .bill-list { padding-left: 16px; padding-right: 16px; }
+    .bill-card { grid-template-columns: 60px 1fr; }
+    .bill-badges { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; }
+    .toolbar-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>2026 California Housing Bills Tracker</h1>
+    <div class="header-sub">Sources: SANDAG (June 10, 2026) &amp; Ascent &nbsp;·&nbsp; Amber border = not in SANDAG &nbsp;·&nbsp; Live status via LegiScan · refreshes daily at 3 AM</div>
+  </div>
+  <div class="sync-status">
+    <span class="sync-dot" id="sync-dot"></span>
+    <span id="sync-label">Checking cache…</span>
+    <button class="refresh-btn" id="refresh-btn" onclick="forceRefresh()">↻ Refresh</button>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Search bills, subjects, descriptions…" autocomplete="off">
+  </div>
+  <div class="toolbar-divider"></div>
+  <div class="filter-group" id="status-filters"></div>
+  <div class="toolbar-divider"></div>
+  <div class="filter-group" id="cat-filters"></div>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+<div class="count-bar"  id="count-bar"></div>
+<div class="bill-list"  id="bill-list"></div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+const LEGISCAN_KEY = "e1b55064872be319c9599280021f5184";
+const CACHE_KEY    = "hsng_bills_legiscan_v4";
+const NOTES_KEY    = "hsng_bills_comments_v1";
+const HEARING_KEY  = "hsng_bills_hearings_v1";
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+// LegiScan progress codes
+const PROGRESS = {
+  0:  { label: "Pre-Filed",    cls: "b-pending"   },
+  1:  { label: "Introduced",   cls: "b-committee" },
+  2:  { label: "Engrossed",    cls: "b-engrossed" },
+  3:  { label: "Enrolled",     cls: "b-engrossed" },
+  4:  { label: "Passed",       cls: "b-passed"    },
+  5:  { label: "Vetoed",       cls: "b-vetoed"    },
+  6:  { label: "Failed",       cls: "b-inactive"  },
+  7:  { label: "Overridden",   cls: "b-passed"    },
+  8:  { label: "Chaptered",    cls: "b-signed"    },
+  9:  { label: "Refer",        cls: "b-pending"   },
+  10: { label: "In Committee", cls: "b-committee" },
+  11: { label: "In Committee", cls: "b-floor"     },
+  12: { label: "Signed",       cls: "b-signed"    },
+  13: { label: "Dead",         cls: "b-inactive"  },
+};
+
+// ── Categories ────────────────────────────────────────────────────────────────
+const CAT = {
+  SB79:    { label: "SB 79",                   cls: "cat-sb79"       },
+  DENSITY: { label: "Density Bonus",           cls: "cat-density"    },
+  STREAM:  { label: "Streamlining",            cls: "cat-streamline" },
+  ADU:     { label: "ADUs / JADUs",            cls: "cat-adu"        },
+  RHNA:    { label: "RHNA / Housing Elements", cls: "cat-rhna"       },
+  FUNDING: { label: "Funding",                 cls: "cat-funding"    },
+  OTHER:   { label: "Other",                   cls: "cat-other"      },
+  UNKNOWN: { label: "Not in SANDAG",           cls: "cat-unknown"    },
+};
+
+// ── Bill data ─────────────────────────────────────────────────────────────────
+const bills = [
+  { id:"AB-11",   subj:"The Social Housing Act",                                                         chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Inactive", cat:"OTHER",    desc:"Would create the California Housing Authority as an independent state body to develop, own, and operate social housing across the state." },
+  { id:"AB-748",  subj:"Preapproved housing plans: single-family and multifamily",                       chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would require local agencies to develop a preapproval program for single-family and multifamily residential housing plans – large jurisdictions by July 1, 2027, small jurisdictions by January 1, 2029. Applications using preapproved plans on qualifying lots must be approved or denied ministerially within 30 days and are exempt from CEQA." },
+  { id:"AB-939",  subj:"Density bonus: affordability of for-sale units",                                 chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Active",   cat:"DENSITY",  desc:"Would add a third compliance option for density bonus for-sale unit affordability requirements: a unit may be purchased by a nonprofit corporation for resale to extremely low, very low, or lower income families participating in a below-market interest rate loan program, as defined." },
+  { id:"AB-956",  subj:"ADUs: CID restrictions and second detached ADU on SFR lots",                     chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Active",   cat:"ADU",      desc:"Would prohibit common interest developments from enforcing restrictions that effectively prohibit or unreasonably restrict ADUs or JADUs and would increase the number of detached new construction ADUs that a local agency must ministerially approve on single-family lots from one to two." },
+  { id:"AB-1070", subj:"HCD working group: small multifamily under California Residential Code",         chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Active",   cat:"OTHER",    desc:"Would direct HCD to convene a working group to consider allowing small multi-family (3 to 10-unit) residential developments to be built under the California Residential Code (CRC) rather than the California Building Code." },
+  { id:"AB-1294", subj:"Housing entitlement applications: completeness and standardization",             chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would require cities and counties to deem an application for a housing development entitlement complete once the applicant submits specified information, and directs HCD to develop a standardized housing entitlement application that cities and counties must accept." },
+  { id:"AB-1567", subj:"General plan: annual report: congregate and residential care for the elderly",   chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Active",   cat:"RHNA",     desc:"Would allow up to 15% of RHNA credits to come from elderly congregate/residential care facilities starting in the 7th cycle." },
+  { id:"AB-1573", subj:"Land use: housing elements: target population",                                  chamber:"Senate",   stage:"Floor – Third Reading",                           sandag:"Active",   cat:"RHNA",     desc:"Would expand \"target population\" in housing element law to include victims of domestic violence, sexual assault, and human trafficking." },
+  { id:"AB-1621", subj:"Post-entitlement permits: plan check rounds and HAA violations",                 chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would limit building permit plan check reviews to 2 rounds, shorten appeal timelines, and tie violations of post-entitlement permit requirements to the Housing Accountability Act (HAA)." },
+  { id:"AB-1623", subj:"RHNA and annual report: student housing quarters",                               chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"RHNA",     desc:"Would allow certain student housing quarters to count toward a jurisdiction's lower-income RHNA progress, and require jurisdictions to report those units by income category in the annual progress report." },
+  { id:"AB-1708", subj:"HHAP round 8: smaller jurisdictions",                                            chamber:"Assembly", stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"FUNDING",  desc:"Would establish requirements for HHAP Round 8, including mandating a regional homelessness action plan and allowing funds to be allocated to smaller jurisdictions with compliant housing elements." },
+  { id:"AB-1710", subj:"HAA: vesting provisions and Permit Streamlining Act",                            chamber:"Senate",   stage:"In Committee – Local Government",                  sandag:"Active",   cat:"STREAM",   desc:"Would expand vesting provisions of the HAA to include additional standards and extend the HAA's \"reasonable person\" consistency standard to the Permit Streamlining Act." },
+  { id:"AB-1738", subj:"State Housing Law: remote inspections",                                          chamber:"Senate",   stage:"Floor – Second Reading",                          sandag:"Active",   cat:"STREAM",   desc:"Would require cities and counties to offer remote inspection options for specified work on one- and two-family dwellings by July 1, 2027." },
+  { id:"AB-1740", subj:"Coastal resources: LCP: coastal development permits: Santa Monica",              chamber:"Senate",   stage:"In Committee – Natural Resources and Water",       sandag:null,       cat:"UNKNOWN",  desc:"Not included in the SANDAG June 2026 tracking document. Tracked in Ascent source only." },
+  { id:"AB-1751", subj:"Missing Middle Townhome Ownership Act",                                          chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would create ministerial approval for townhome projects up to 3 stories with streamlined subdivision map approval." },
+  { id:"AB-1771", subj:"State Housing Law: apartment houses",                                            chamber:"Assembly", stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"OTHER",    desc:"Would require HCD to study and report on the effectiveness of the on-site manager requirement in apartment buildings with 16+ units." },
+  { id:"AB-1903", subj:"Construction defect claim procedures: condos and townhouses",                    chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Active",   cat:"OTHER",    desc:"Would revise construction defect claim procedures for new condominium and townhouse developments, including expanding builder inspection rights, increasing the burden on homeowners to prove physical damage, and restricting certain HOA claims." },
+  { id:"AB-1914", subj:"General plan elements: childcare",                                               chamber:"Senate",   stage:"In Committee – Human Services",                   sandag:"Active",   cat:"OTHER",    desc:"Would require cities and counties to prepare and adopt a childcare plan, or integrate one into the next general plan update, between January 1, 2028 and January 1, 2033." },
+  { id:"AB-1997", subj:"Housing development approvals: timelines and processes",                         chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would require local agencies to approve or disapprove certain housing projects within 30 days after EIR certification, if the project is at least 90% affordable and has applied for time-sensitive public funding." },
+  { id:"AB-2002", subj:"Regional Early Action Planning Fund: codification",                              chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Active",   cat:"FUNDING",  desc:"Would codify the Regional Early Action Program (REAP) to provide grants to local jurisdictions for planning activities needed to meet the 7th and subsequent RHNA cycles." },
+  { id:"AB-2005", subj:"SB 9 urban lot split: owner-occupancy modification",                             chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would modify SB 9 urban lot split requirements to allow owner-occupancy to be satisfied either by the applicant or by requiring a subsequent homebuyer to occupy a unit for 3 years." },
+  { id:"AB-2074", subj:"Regional transit hub districts: downtown housing by right",                      chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would require cities with 400,000+ population and at least two TOD stops to designate regional transit hub districts where downtown housing is allowed by right, and establishes a state loan fund." },
+  { id:"AB-2079", subj:"Adaptive Reuse Investment Incentive Program",                                    chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"FUNDING",  desc:"Would expand the adaptive reuse investment incentive program to include all projects regardless of affordability or labor standards compliance, and broaden the use of property tax increment financing." },
+  { id:"AB-2094", subj:"Social Housing Strategy and Implementation Program",                             chamber:"Assembly", stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"OTHER",    desc:"Would require HCD to establish a dedicated social housing coordinator to lead social housing strategy and implementation, including inventorying surplus public land." },
+  { id:"AB-2118", subj:"AB 2011/SB 6: use by right: objective standards",                               chamber:"Senate",   stage:"In Committee – Local Government",                  sandag:"Active",   cat:"STREAM",   desc:"Would prohibit objective standards from restricting mixed-use development in AB 2011 (Affordable Housing and High Road Jobs Act) projects." },
+  { id:"AB-2127", subj:"ADUs: private sewage disposal systems",                                          chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"ADU",      desc:"Would prohibit local agencies from banning ADUs solely because lots are served by private sewage systems, and limit when local health officers can deny approval or require new/alternative systems." },
+  { id:"AB-2146", subj:"Supportive housing: California DASH designation",                                chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"OTHER",    desc:"Would establish the California Direct Access to Supportive Housing (DASH) designation to streamline tenant eligibility documentation and referrals for certain supportive housing units." },
+  { id:"AB-2185", subj:"Affordable housing programs: factory built housing",                             chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"FUNDING",  desc:"Would require state housing finance agencies to update guidelines by July 1, 2027 to allow factory built housing in major affordable housing programs." },
+  { id:"AB-2252", subj:"Building standards: single-stair multifamily residential buildings",             chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"OTHER",    desc:"Would require HCD to develop building standards for single-exit, single-stairway multifamily residential buildings up to 6 stories for the next triennial Building Standards Code update." },
+  { id:"AB-2295", subj:"Regional housing need: jointly funded projects",                                 chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"RHNA",     desc:"Would allow two local governments' jointly funded housing projects to count toward both jurisdictions' RHNA obligations." },
+  { id:"AB-2296", subj:"Housing element and RHNA: procedural changes",                                   chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"RHNA",     desc:"Would extend the window for subregional entity formation from 28 to 34 months before a housing element revision, and move up RHNA methodology development and draft allocation timelines by 6 months each." },
+  { id:"AB-2351", subj:"General plan: annual report: shelter beds",                                      chamber:"Assembly", stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"RHNA",     desc:"Would require annual progress reports to include shelter bed counts by type beginning April 1, 2027." },
+  { id:"AB-2390", subj:"SB 35/SB 423: streamlined approval modifications",                              chamber:"Senate",   stage:"In Committee – Local Government",                  sandag:"Active",   cat:"STREAM",   desc:"Would clarify that modification approvals under SB 35/SB 423 must be evaluated against objective standards in effect at original application, and extend the litigation-based approval validity period to all modification requests." },
+  { id:"AB-2397", subj:"Community facilities districts: critical housing infrastructure",                chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"FUNDING",  desc:"Would limit a local agency's ability to block a critical housing infrastructure district formed to finance facilities serving a housing project with lower- or moderate-income units." },
+  { id:"AB-2400", subj:"General plan: annual report: suite-style student housing quarters",              chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"RHNA",     desc:"Would require cities and counties to report the number of suite-style student housing quarters in the housing element annual progress report." },
+  { id:"AB-2415", subj:"SB 79: exemption for jurisdictions with pre-2000 historic districts",            chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"SB79",     desc:"Would add an additional exemption from SB 79 for a jurisdiction with a local historic district designated before January 1, 2000, with a population less than 150,000, and more than one TOD zone." },
+  { id:"AB-2433", subj:"Density Bonus Law: ministerial review, FAR, contiguous sites",                  chamber:"Senate",   stage:"In Committee – Local Government",                  sandag:"Active",   cat:"DENSITY",  desc:"Would amend Density Bonus Law to make qualifying projects a use by right subject to ministerial review, remove the contiguous-sites requirement, provide additional homeownership incentives, and amend FAR provisions." },
+  { id:"AB-2480", subj:"Density bonus: student housing developments",                                    chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Active",   cat:"DENSITY",  desc:"Would create an additional density bonus tier for student housing developments." },
+  { id:"AB-2552", subj:"CEQA: TOD Implementation Fund as transportation mitigation",                     chamber:"Assembly", stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"OTHER",    desc:"Would clarify that contributions to the Transit-Oriented Development Implementation Fund may serve as legally sufficient CEQA mitigation for significant transportation impacts." },
+  { id:"AB-2576", subj:"SB 79: exemptions for individual and district historic sites",                   chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"SB79",     desc:"Would expand exemptions from SB 79 to also include individual historic sites and sites within a historic district listed in the State Historic Resources Inventory." },
+  { id:"AB-2601", subj:"Concurrent duplex/lot split processing; condo conversions under SB 9",           chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Active",   cat:"STREAM",   desc:"Would allow concurrent processing of duplex, lot split, and subdivision applications, and permits primary dwellings to convert to condos in lot splits as allowed by SB 9 and SB 684/1123." },
+  { id:"AB-2676", subj:"Housing Crisis Act of 2019: moratoria and capacity reductions",                  chamber:"Senate",   stage:"Pending Referral",                                sandag:"Active",   cat:"STREAM",   desc:"Would strengthen the Housing Crisis Act of 2019 by expanding the moratorium prohibition to include a city's sphere of influence, clarifying that voter initiatives extending restrictions require HCD approval, and establishing a 3-year statute of limitations." },
+  { id:"AB-2702", subj:"Residential care facilities on faith-based lands",                               chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"OTHER",    desc:"Would establish a streamlined approval pathway for residential care facilities on land owned by religious institutions, with density bonus eligibility and reduced parking requirements near transit." },
+  { id:"AB-2741", subj:"Housing element: overlay zones and substantial compliance",                      chamber:"Assembly", stage:"In Committee – Local Government",                  sandag:"Inactive", cat:"RHNA",     desc:"Would clarify that overlay zones and similar zoning tools may satisfy housing element sites inventory requirements, and provide that a housing element found out of compliance remains substantially compliant for up to 275 days after a court order." },
+  { id:"SB-417",  subj:"Affordable Housing Bond Act of 2026: $10B ballot measure",                      chamber:"Assembly", stage:"Floor – Third Reading",                           sandag:"Active",   cat:"FUNDING",  desc:"Would authorize a $10 billion affordable housing bond to be on the November 2026 ballot, funding rental, homeownership, and farmworker housing programs." },
+  { id:"SB-457",  subj:"Housing element: committed assistance and realistic capacity formula",           chamber:"Assembly", stage:"In Committee – Local Government",                 sandag:null,       cat:"UNKNOWN",  desc:"Not included in the SANDAG June 2026 tracking document. Tracked in Ascent source only." },
+  { id:"SB-677",  subj:"HAA: tax-exempt bonds and subdivision map appeals",                              chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Active",   cat:"STREAM",   desc:"Would expand the HAA definition of \"disapprove\" to include failure to act on tax-exempt private activity bonds for qualifying housing projects, and limit certain appeals of tentative and final maps." },
+  { id:"SB-722",  subj:"SB 79: mobilehome and RV park site exemptions",                                 chamber:"Assembly", stage:"In Committee – Appropriations",                   sandag:"Active",   cat:"SB79",     desc:"Would exempt sites governed under the Mobilehome Residency Law, Recreational Vehicle Park Occupancy Law, Mobilehome Parks Act, or Special Occupancy Parks Act from SB 79. Urgency statute." },
+  { id:"SB-866",  subj:"Housing element: unhoused population data and actions",                          chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Active",   cat:"RHNA",     desc:"Would require local governments not receiving HHAP funding to include additional housing element information regarding the unhoused population and key actions to reduce homelessness." },
+  { id:"SB-908",  subj:"Residential windows: retrofitting and Building Code compliance",                 chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:null,       cat:"UNKNOWN",  desc:"Not included in the SANDAG June 2026 tracking document. Tracked in Ascent source only." },
+  { id:"SB-954",  subj:"CEQA: advanced manufacturing facilities: exemption",                            chamber:"Assembly", stage:"In Committee – Natural Resources",                 sandag:null,       cat:"UNKNOWN",  desc:"Not included in the SANDAG June 2026 tracking document. Tracked in Ascent source only." },
+  { id:"SB-967",  subj:"Housing element: interim housing units: acutely low income households",         chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"RHNA",     desc:"Would allow cities and counties to count approved interim housing units toward up to 50% of their acutely low income RHNA obligation in annual progress reports." },
+  { id:"SB-979",  subj:"Housing element: RHNA: judicial review",                                        chamber:"Senate",   stage:"In Committee – Housing",                          sandag:null,       cat:"UNKNOWN",  desc:"Not included in the SANDAG June 2026 tracking document. Tracked in Ascent source only." },
+  { id:"SB-1003", subj:"Prohousing enhanced infrastructure financing districts",                        chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Active",   cat:"FUNDING",  desc:"Would authorize prohousing-designated cities and counties to establish a new type of enhanced infrastructure financing district (prohousing EIFD) with expanded authorized activities." },
+  { id:"SB-1014", subj:"Development projects: required improvements estimate",                          chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Active",   cat:"STREAM",   desc:"Would require cities and counties to provide a list of required onsite and offsite improvements and a cost estimate within 30 days of a project application upon request." },
+  { id:"SB-1072", subj:"Housing omnibus: 8th cycle deadlines and technical updates",                    chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Active",   cat:"OTHER",    desc:"Would make omnibus housing law updates including setting the 8th cycle housing element revision deadline as June 30, 2032, and making technical changes to AB 2011 and Housing Crisis Act provisions." },
+  { id:"SB-1087", subj:"Sustainable communities strategy: 8-year cycle restructuring",                  chamber:"Senate",   stage:"In Committee – Transportation",                   sandag:"Active",   cat:"OTHER",    desc:"Would restructure sustainable communities strategy requirements to an 8-year cycle beginning with the first or second RTP prepared on or after January 1, 2027. Transfers review authority from CARB to the California Transportation Commission. Exempts RTPs and sustainable communities strategies from CEQA." },
+  { id:"SB-1091", subj:"Community Anti-Displacement and Preservation Program",                          chamber:"Assembly", stage:"In Committee – Judiciary",                         sandag:"Active",   cat:"FUNDING",  desc:"Would create a state program to acquire and rehabilitate market rate housing and convert it to long-term affordable housing, with tenant displacement protections." },
+  { id:"SB-1116", subj:"Starter Home Revitalization Act: ministerial approval expansion",               chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Active",   cat:"STREAM",   desc:"Would expand and clarify ministerial approval for housing on subdivided lots under SB 684 by limiting local density-constraining standards, reducing minimum lot sizes, and increasing HCD oversight of local ordinances." },
+  { id:"SB-1117", subj:"ADUs: impact fee calculation based on area over 750 sq ft",                    chamber:"Assembly", stage:"In Committee – Local Government",                  sandag:"Active",   cat:"ADU",      desc:"Would change how jurisdictions calculate impact fees for ADUs by only allowing fees based on the area in excess of 750 square feet of interior livable space." },
+  { id:"SB-1122", subj:"ADU ordinances: annual progress report requirements",                           chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"ADU",      desc:"Would require cities and counties with ADU ordinances to report the ordinance's code section and enactment or most recent update date in the housing element annual progress report." },
+  { id:"SB-1182", subj:"General plan: safety element: VHFHSZ insurance availability",                 chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"OTHER",    desc:"Would require safety elements updated on or after January 1, 2028 to address insurance availability in very high fire hazard severity zones and state responsibility areas." },
+  { id:"SB-1196", subj:"ADUs: utility electrical connection timelines",                                 chamber:"Assembly", stage:"In Committee – Utilities and Energy",              sandag:"Active",   cat:"ADU",      desc:"Would require the Public Utilities Commission to establish timelines by September 30, 2027 for utilities to process and complete electrical service connections for ADUs and JADUs." },
+  { id:"SB-1318", subj:"Coastal resources: LCP: short-term rental restrictions",                       chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"OTHER",    desc:"Would require Coastal Commission to approve coastal permits or LCP amendments that restrict or prohibit non-owner-occupied short-term rentals if a jurisdiction demonstrates the action is needed to address housing needs." },
+  { id:"SB-1361", subj:"SB 79: local governments and transit project approvals",                       chamber:"Assembly", stage:"In Committee – Local Government",                  sandag:"Active",   cat:"SB79",     desc:"Prohibits local governments with existing or planned TOD stops from interfering with a transit project's approval, including reducing transit service or withholding support for transit funding." },
+  { id:"SB-1383", subj:"Density bonus: labor standards not waivable via concessions",                  chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"DENSITY",  desc:"Would clarify that an applicant cannot use density bonus incentives and concessions to waive or modify labor requirements." },
+  { id:"SB-1426", subj:"Housing element annual progress report: organizational updates",                chamber:"Senate",   stage:"Passed – Enrollment",                             sandag:"Active",   cat:"RHNA",     desc:"Would make nonsubstantive and organizational updates to housing element annual progress report requirements, consolidating reporting provisions into Gov. Code Section 65400. Takes effect immediately as an urgency statute." },
+];
+
+// ── LegiScan direct API calls ─────────────────────────────────────────────────
+let liveData = {};
+let notesData = {};    // billId -> array of {id, text, ts}
+let hearingData = {}; // billId -> { date, committee } | null
+
+async function legiScanGet(params) {
+  const qs = new URLSearchParams({ key: LEGISCAN_KEY, ...params });
+  const resp = await fetch(`https://api.legiscan.com/?${qs}`);
+  if (!resp.ok) throw new Error(`LegiScan HTTP ${resp.status}`);
+  const data = await resp.json();
+  if (data.status === "ERROR") throw new Error(data.alert?.message || "LegiScan API error");
+  return data;
+}
+
+async function getCASessionId() {
+  // Find the current CA 2025-2026 regular session ID dynamically
+  const data = await legiScanGet({ op: "getSessionList", state: "CA" });
+  const sessions = data.sessions || [];
+  // Prefer session with "2025-2026 Regular Session" in name
+  const match = sessions.find(s =>
+    s.session_name && /2025.?2026/i.test(s.session_name) && /regular/i.test(s.session_name)
+  ) || sessions.find(s =>
+    s.session_name && /2025.?2026/i.test(s.session_name)
+  ) || sessions[0];
+  if (!match) throw new Error("Could not find CA 2025-2026 session");
+  return match.session_id;
+}
+
+
+// bill_id lookup map — populated after getMasterList
+let billIdMap = {}; // "AB-748" -> legiscan bill_id integer
+
+async function fetchHearing(billId) {
+  // Called on-demand; uses getBill which includes hearing field
+  if (hearingData.hasOwnProperty(billId)) return;
+  try {
+    const lsId = billIdMap[billId];
+    if (!lsId) { hearingData[billId] = null; saveHearings(); return; }
+    const data = await legiScanGet({ op: "getBill", id: lsId });
+    const bill = data.bill || {};
+    // LegiScan returns hearing as array of objects with date, time, description, location
+    const hearings = bill.hearing || bill.hearings || bill.calendar || [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = hearings
+      .map(h => {
+        const d = parseHearingDate(h.date || "");
+        return { date: h.date || null, time: h.time || "", location: h.location || "", committee: h.description || h.committee || "", d };
+      })
+      .filter(h => h.d && !isNaN(h.d) && h.d >= today)
+      .sort((a, b) => a.d - b.d);
+    hearingData[billId] = upcoming.length > 0
+      ? { date: upcoming[0].date, time: upcoming[0].time, location: upcoming[0].location, committee: upcoming[0].committee, source: "api" }
+      : null;
+    saveHearings();
+    render();
+  } catch(e) {
+    hearingData[billId] = null;
+    saveHearings();
+  }
+}
+
+// After getMasterList, store bill_id map and bulk-fetch hearings for all tracked bills
+// We fetch in small batches to stay within rate limits — 2 calls/sec
+async function fetchAllHearings() {
+  const toFetch = bills.filter(b => !hearingData.hasOwnProperty(b.id) && billIdMap[b.id]);
+  if (!toFetch.length) return;
+  setSyncStatus("syncing", `Fetching hearing dates (0/${toFetch.length})…`);
+  let done = 0;
+  const BATCH = 3;
+  for (let i = 0; i < toFetch.length; i += BATCH) {
+    const chunk = toFetch.slice(i, i + BATCH);
+    await Promise.all(chunk.map(b => fetchHearing(b.id)));
+    done += chunk.length;
+    setSyncStatus("syncing", `Fetching hearing dates (${done}/${toFetch.length})…`);
+    if (i + BATCH < toFetch.length) await new Promise(r => setTimeout(r, 600));
+  }
+  saveHearings();
+  setSyncStatus("ok", `Live · hearings updated`);
+  render();
+}
+
+function parseAllHearings() {
+  // No-op — hearings now come from API, not last_action parsing
+}
+
+function saveHearings() {
+  try { localStorage.setItem(HEARING_KEY, JSON.stringify(hearingData)); } catch(e) {}
+}
+
+function loadHearings() {
+  try {
+    const raw = localStorage.getItem(HEARING_KEY);
+    if (raw) hearingData = JSON.parse(raw);
+  } catch(e) {}
+}
+
+async function syncAllBills(force = false) {
+  // Check 24hr cache
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!force && raw) {
+      const cache = JSON.parse(raw);
+      if (Date.now() - cache.timestamp < CACHE_TTL_MS) {
+        liveData = cache.data;
+        if (cache.billIdMap) billIdMap = cache.billIdMap;
+        setSyncStatus("ok", `Live · updated ${formatAge(Date.now() - cache.timestamp)}`);
+        render();
+        scheduleNextRefresh(CACHE_TTL_MS - (Date.now() - cache.timestamp));
+        return;
+      }
+    }
+  } catch(e) {}
+
+  setSyncStatus("syncing", "Fetching session info…");
+  document.getElementById("refresh-btn").disabled = true;
+
+  try {
+    // Step 1: get correct session ID for CA 2025-2026
+    const sessionId = await getCASessionId();
+
+    setSyncStatus("syncing", "Fetching bill list from LegiScan…");
+
+    // Step 2: getMasterList — single call returns all bills in the session
+    const masterData = await legiScanGet({ op: "getMasterList", id: sessionId });
+    const masterList = masterData.masterlist || {};
+
+    // Build lookup: "AB 748" -> master entry
+    const masterMap = {};
+    Object.values(masterList).forEach(item => {
+      if (item && item.number) {
+        masterMap[item.number.toUpperCase().trim()] = item;
+      }
+    });
+
+    // Step 3: match our 69 bills, also store bill_id for hearing lookups
+    const results = {};
+    bills.forEach(b => {
+      // Our IDs: "AB-748" -> try "AB 748" and "AB748"
+      const keySpaced = b.id.replace("-", " ").toUpperCase();
+      const keyPlain  = b.id.replace("-", "").toUpperCase();
+      const item = masterMap[keySpaced] || masterMap[keyPlain];
+      if (item) {
+        const prog = PROGRESS[item.progress] || { label: "In Committee", cls: "b-committee" };
+        results[b.id] = {
+          label:          prog.label,
+          cls:            prog.cls,
+          lastAction:     item.last_action      || "",
+          lastActionDate: item.last_action_date  || "",
+          progress:       item.progress,
+          url:            item.url               || "",
+        };
+        if (item.bill_id) billIdMap[b.id] = item.bill_id;
+      }
+    });
+
+    liveData = results;
+    const matched = Object.keys(results).length;
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: results, billIdMap }));
+    setSyncStatus("ok", `Live · ${matched} of ${bills.length} bills matched`);
+    scheduleNextRefresh(CACHE_TTL_MS);
+    // Now fetch hearing dates for all matched bills
+    await fetchAllHearings();
+
+  } catch(err) {
+    console.error("LegiScan sync error:", err);
+    setSyncStatus("error", `Sync failed: ${err.message}`);
+  }
+
+  document.getElementById("refresh-btn").disabled = false;
+  render();
+}
+
+
+function addComment(billId, text) {
+  if (!text.trim()) return;
+  if (!notesData[billId]) notesData[billId] = [];
+  notesData[billId].push({
+    id:   Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    text: text.trim(),
+    ts:   new Date().toISOString(),
+  });
+  try { localStorage.setItem(NOTES_KEY, JSON.stringify(notesData)); } catch(e) {}
+  render();
+}
+
+function deleteComment(billId, commentId) {
+  if (!notesData[billId]) return;
+  notesData[billId] = notesData[billId].filter(c => c.id !== commentId);
+  if (notesData[billId].length === 0) delete notesData[billId];
+  try { localStorage.setItem(NOTES_KEY, JSON.stringify(notesData)); } catch(e) {}
+  render();
+}
+
+function loadNotes() {
+  try {
+    const raw = localStorage.getItem(NOTES_KEY);
+    if (raw) notesData = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function formatTs(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    + " " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+function forceRefresh() {
+  localStorage.removeItem(CACHE_KEY);
+  syncAllBills(true);
+}
+
+function scheduleNextRefresh(remainingMs) {
+  // Also schedule at next 3 AM
+  const now   = new Date();
+  const next3 = new Date(now);
+  next3.setHours(3, 0, 0, 0);
+  if (next3 <= now) next3.setDate(next3.getDate() + 1);
+  const delay = Math.min(remainingMs, next3 - now);
+  setTimeout(() => syncAllBills(true), delay);
+}
+
+function setSyncStatus(state, label) {
+  document.getElementById("sync-dot").className = "sync-dot " + state;
+  document.getElementById("sync-label").textContent = label;
+}
+
+function formatAge(ms) {
+  const mins = Math.floor(ms / 60000);
+  const hrs  = Math.floor(mins / 60);
+  if (hrs > 0)  return `${hrs}h ago`;
+  if (mins > 0) return `${mins}m ago`;
+  return "just now";
+}
+
+// ── Rendering ─────────────────────────────────────────────────────────────────
+function effectiveStage(b) {
+  return liveData[b.id] ? liveData[b.id].label : b.stage;
+}
+
+const stageRank = s => {
+  if (!s) return 5;
+  const sl = s.toLowerCase();
+  if (sl.includes("signed") || sl.includes("chaptered")) return 0;
+  if (sl.includes("passed") || sl.includes("enrolled"))  return 1;
+  if (sl.includes("engrossed") || sl.includes("floor"))  return 2;
+  if (sl.includes("dead") || sl.includes("failed") || sl.includes("vetoed")) return 6;
+  if (sl.includes("pending") || sl.includes("pre-filed")) return 4;
+  return 3;
+};
+
+const statusFilters = [
+  { label: "All",           fn: () => true },
+  { label: "Active",        fn: b => b.sandag === "Active" },
+  { label: "Inactive",      fn: b => b.sandag === "Inactive" },
+  { label: "Not in SANDAG", fn: b => b.sandag === null },
+  { label: "On Floor",      fn: b => {
+    const s = effectiveStage(b).toLowerCase();
+    return s.includes("floor") || s.includes("passed") || s.includes("enrolled") || s.includes("signed") || s.includes("chaptered") || s.includes("engrossed");
+  }},
+  { label: "Changed since SANDAG", fn: b => {
+    const live = liveData[b.id];
+    return !!live && live.label !== b.stage;
+  }},
+  { label: "Has Hearing", fn: b => {
+    return hearingData.hasOwnProperty(b.id) && hearingData[b.id] !== null;
+  }},
+  { label: "Has Notes", fn: b => !!(notesData[b.id] && notesData[b.id].length > 0) },
+  { label: "Senate",   fn: b => b.chamber === "Senate"   },
+  { label: "Assembly", fn: b => b.chamber === "Assembly" },
+];
+
+const catFilterOrder = ["SB79","DENSITY","STREAM","ADU","RHNA","FUNDING","OTHER"];
+let currentStatus = "All", currentCat = "All", searchVal = "";
+
+function stageBadge(b) {
+  if (b.sandag === "Inactive") return '<span class="badge b-inactive">Inactive</span>';
+  if (b.sandag === null)       return '<span class="badge b-notsandag">Not in SANDAG</span>';
+  const live  = liveData[b.id];
+  const label = live ? live.label : b.stage;
+  const cls   = live ? live.cls   : "b-committee";
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function chamberBadge(c) {
+  return `<span class="badge ${c === "Senate" ? "b-senate" : "b-assembly"}">${c}</span>`;
+}
+
+function catTag(k) {
+  const c = CAT[k] || CAT.OTHER;
+  return `<span class="cat ${c.cls}">${c.label}</span>`;
+}
+
+
+function parseHearingDate(dateStr) {
+  if (!dateStr) return null;
+  // Normalize to YYYY-MM-DD if needed
+  // Handle "YYYY-MM-DD", "MM/DD/YYYY", "Month DD YYYY", "Month DD, YYYY"
+  let d = null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim())) {
+    // Already ISO — parse as local date to avoid UTC shift
+    const [y, m, day] = dateStr.trim().split("-").map(Number);
+    d = new Date(y, m - 1, day);
+  } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr.trim())) {
+    const [m, day, y] = dateStr.trim().split("/").map(Number);
+    d = new Date(y, m - 1, day);
+  } else {
+    d = new Date(dateStr);
+  }
+  return (!d || isNaN(d.getTime())) ? null : d;
+}
+
+function hearingRow(b) {
+  if (!hearingData.hasOwnProperty(b.id)) return "";
+  const h = hearingData[b.id];
+  if (!h || !h.date) return "";
+
+  const hDate = parseHearingDate(h.date);
+  if (!hDate) return "";
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  hDate.setHours(0,0,0,0);
+  const diffDays = Math.round((hDate - today) / 86400000);
+  if (diffDays < 0) return ""; // past hearing, don't show
+
+  let pillClass = "future", pillLabel = `IN ${diffDays}d`;
+  if (diffDays === 0)     { pillClass = "today"; pillLabel = "TODAY"; }
+  else if (diffDays <= 7) { pillClass = "soon";  }
+
+  const dateStr = hDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const timeStr = h.time ? ` · ${h.time}` : "";
+  const cmteStr = h.committee ? ` · ${h.committee}` : "";
+  return `<div class="hearing-row">
+    <span class="hearing-pill ${pillClass}">${pillLabel}</span>
+    <span class="hearing-date">${dateStr}${timeStr}</span>
+    <span class="hearing-cmte">${cmteStr}</span>
+  </div>`;
+}
+
+function notesRow(b) {
+  const comments = notesData[b.id] || [];
+  const logHtml = comments.map(c => `
+    <div class="comment-entry">
+      <div class="comment-meta">
+        <span class="comment-author">Matt</span>
+        <span class="comment-ts">${formatTs(c.ts)}</span>
+        <button class="comment-delete" onclick="deleteComment('${b.id}','${escAttr(c.id)}')" title="Delete">✕</button>
+      </div>
+      <div class="comment-text">${escHtml(c.text)}</div>
+    </div>`).join("");
+
+  return `<div class="comments-section">
+    ${comments.length > 0 ? `<div class="comments-log">${logHtml}</div>` : ""}
+    <div class="comment-composer">
+      <button class="comment-add-btn" id="comment-btn-${b.id}"
+        onclick="openCommentBox('${b.id}')">＋ Add comment…</button>
+      <div style="display:none" id="comment-box-${b.id}">
+        <textarea class="comment-textarea" id="comment-ta-${b.id}"
+          placeholder="Add a comment…" onkeydown="commentKeydown(event,'${b.id}')"></textarea>
+        <div class="comment-actions">
+          <button class="comment-post" onclick="postComment('${b.id}')">Post</button>
+          <button class="comment-cancel-btn" onclick="closeCommentBox('${b.id}')">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function escAttr(s) { return String(s).replace(/'/g,"\'"); }
+
+function openCommentBox(billId) {
+  document.getElementById("comment-btn-" + billId).style.display = "none";
+  document.getElementById("comment-box-" + billId).style.display = "flex";
+  document.getElementById("comment-box-" + billId).style.flexDirection = "column";
+  document.getElementById("comment-box-" + billId).style.gap = "5px";
+  const ta = document.getElementById("comment-ta-" + billId);
+  ta.focus();
+
+}
+
+function closeCommentBox(billId) {
+  document.getElementById("comment-box-" + billId).style.display = "none";
+  document.getElementById("comment-btn-" + billId).style.display = "";
+  document.getElementById("comment-ta-" + billId).value = "";
+}
+
+function postComment(billId) {
+  const val = document.getElementById("comment-ta-" + billId).value;
+  if (!val.trim()) return;
+  addComment(billId, val);
+}
+
+function commentKeydown(e, billId) {
+  // Cmd/Ctrl+Enter to post
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    postComment(billId);
+  }
+}
+
+function liveRow(b) {
+  const live = liveData[b.id];
+  if (!live) return "";
+  const dateStr = live.lastActionDate ? ` · ${live.lastActionDate}` : "";
+  const action  = live.lastAction ? `<span class="live-date">${live.lastAction}${dateStr}</span>` : "";
+  const link    = live.url ? ` <a class="live-link" href="${live.url}" target="_blank">leginfo ↗</a>` : "";
+  return `<div class="live-row">
+    <span class="live-pill">LIVE</span>
+    <span class="live-stage">${live.label}</span>
+    ${action}${link}
+  </div>`;
+}
+
+function render() {
+  const q = searchVal.toLowerCase();
+  const filtered = bills.filter(b => {
+    const sf = statusFilters.find(f => f.label === currentStatus);
+    if (!sf.fn(b)) return false;
+    if (currentCat !== "All" && b.cat !== currentCat) return false;
+    if (q) return b.id.toLowerCase().includes(q) || b.subj.toLowerCase().includes(q) || b.desc.toLowerCase().includes(q);
+    return true;
+  }).sort((a, b) => {
+    const ra = a.sandag === "Inactive" ? 10 : a.sandag === null ? 5 : 0;
+    const rb = b.sandag === "Inactive" ? 10 : b.sandag === null ? 5 : 0;
+    if (ra !== rb) return ra - rb;
+    return stageRank(effectiveStage(a)) - stageRank(effectiveStage(b));
+  });
+
+  const list = document.getElementById("bill-list");
+  list.innerHTML = filtered.length === 0
+    ? '<div class="no-results">No bills match your filters.</div>'
+    : filtered.map(b => {
+        const inactive  = b.sandag === "Inactive";
+        const notSandag = b.sandag === null;
+        const live      = liveData[b.id];
+        const changed   = live && live.label !== b.stage;
+        const hasNote    = !!(notesData[b.id] && notesData[b.id].length > 0);
+        const hasHearing = hearingData.hasOwnProperty(b.id) && hearingData[b.id] !== null;
+        return `<div class="bill-card${inactive ? " is-inactive" : ""}${notSandag ? " not-sandag" : ""}${changed ? " live-changed" : ""}">
+          <span class="bill-id">${b.id}${hasNote ? '<span class="note-dot" title="Has notes"></span>' : ""}</span>
+          <div class="bill-main">
+            <div class="bill-top">
+              <span class="bill-subj${inactive ? " inactive-subj" : ""}">${b.subj}</span>
+              ${catTag(b.cat)}
+              ${hasHearing ? hearingRow(b) : ""}
+            </div>
+            ${liveRow(b)}
+            <span class="bill-desc${notSandag ? " no-desc" : ""}">${b.desc}</span>
+            ${notesRow(b)}
+          </div>
+          <div class="bill-badges">
+            ${chamberBadge(b.chamber)}
+            ${stageBadge(b)}
+          </div>
+        </div>`;
+      }).join("");
+
+  document.getElementById("count-bar").textContent =
+    `Showing ${filtered.length} of ${bills.length} bills · ${Object.keys(liveData).length} with live LegiScan status`;
+  updateStats();
+}
+
+function updateStats() {
+  const active   = bills.filter(b => b.sandag === "Active").length;
+  const inactive = bills.filter(b => b.sandag === "Inactive").length;
+  const notSan   = bills.filter(b => b.sandag === null).length;
+  const floor    = bills.filter(b => {
+    const s = effectiveStage(b).toLowerCase();
+    return (s.includes("floor")||s.includes("passed")||s.includes("signed")||s.includes("enrolled")||s.includes("chaptered")) && b.sandag !== "Inactive";
+  }).length;
+  document.getElementById("stats-bar").innerHTML = `
+    <div class="stat"><div class="stat-n">${bills.length}</div><div class="stat-l">Total bills</div></div>
+    <div class="stat"><div class="stat-n">${active}</div><div class="stat-l">Active</div></div>
+    <div class="stat"><div class="stat-n">${inactive}</div><div class="stat-l">Inactive (SANDAG)</div></div>
+    <div class="stat"><div class="stat-n">${notSan}</div><div class="stat-l">Not in SANDAG</div></div>
+    <div class="stat"><div class="stat-n">${floor}</div><div class="stat-l">On floor / passed</div></div>
+  `;
+}
+
+// ── Filter buttons ────────────────────────────────────────────────────────────
+const statusBar = document.getElementById("status-filters");
+statusFilters.forEach(f => {
+  const btn = document.createElement("button");
+  btn.className = "fbtn" + (f.label === "All" ? " on" : "");
+  btn.textContent = f.label; btn.dataset.group = "status";
+  btn.onclick = () => {
+    currentStatus = f.label;
+    document.querySelectorAll("[data-group='status']").forEach(b => b.classList.toggle("on", b.textContent === f.label));
+    render();
+  };
+  statusBar.appendChild(btn);
+});
+
+const catBar = document.getElementById("cat-filters");
+const allCatBtn = document.createElement("button");
+allCatBtn.className = "fbtn on"; allCatBtn.textContent = "All categories"; allCatBtn.dataset.group = "cat";
+allCatBtn.onclick = () => {
+  currentCat = "All";
+  document.querySelectorAll("[data-group='cat']").forEach(b => b.classList.toggle("on", b === allCatBtn));
+  render();
+};
+catBar.appendChild(allCatBtn);
+catFilterOrder.forEach(key => {
+  const btn = document.createElement("button");
+  btn.className = "fbtn"; btn.textContent = CAT[key].label; btn.dataset.group = "cat";
+  btn.onclick = () => {
+    currentCat = key;
+    document.querySelectorAll("[data-group='cat']").forEach(b => b.classList.toggle("on", b === btn));
+    render();
+  };
+  catBar.appendChild(btn);
+});
+
+document.getElementById("search").addEventListener("input", e => { searchVal = e.target.value; render(); });
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+loadNotes();
+loadHearings();
+render();
+syncAllBills();
+</script>
+</body>
+</html>
