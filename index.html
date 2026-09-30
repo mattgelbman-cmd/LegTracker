@@ -161,6 +161,40 @@
   .comment-cancel-btn { background: #f0ede8; color: #555; }
   .note-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; margin-left: 4px; vertical-align: middle; }
 
+  /* ── Enacted section ── */
+  .enacted-section {
+    margin: 12px 24px 0;
+    border: 1.5px solid #58D68D;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .enacted-header {
+    background: #D5F5E3; padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; user-select: none;
+  }
+  .enacted-header h2 { font-size: 13px; font-weight: 600; color: #145A32; }
+  .enacted-header .enacted-count {
+    font-size: 11px; background: #145A32; color: #fff;
+    padding: 1px 8px; border-radius: 999px; font-weight: 600;
+  }
+  .enacted-header .enacted-chevron {
+    margin-left: auto; width: 16px; height: 16px;
+    stroke: #145A32; fill: none; transition: transform 0.18s;
+  }
+  .enacted-section.open .enacted-chevron { transform: rotate(180deg); }
+  .enacted-body { display: none; background: #fff; }
+  .enacted-section.open .enacted-body { display: block; }
+  .enacted-card {
+    padding: 10px 16px; border-top: 0.5px solid #D5F5E3;
+    display: grid; grid-template-columns: 80px 1fr auto;
+    gap: 8px 14px; align-items: start;
+  }
+  .enacted-id   { font-weight: 600; font-size: 13px; color: #145A32; white-space: nowrap; }
+  .enacted-subj { font-size: 13px; font-weight: 500; color: #1a1a18; }
+  .enacted-desc { font-size: 12px; color: #555; line-height: 1.55; margin-top: 3px; }
+  .enacted-meta { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+
   .no-results { padding: 40px 32px; text-align: center; color: #999; font-size: 14px; }
 
   @media (max-width: 640px) {
@@ -197,6 +231,7 @@
 </div>
 
 <div class="stats-bar" id="stats-bar"></div>
+<div id="enacted-section"></div>
 <div class="count-bar"  id="count-bar"></div>
 <div class="bill-list"  id="bill-list"></div>
 
@@ -548,6 +583,11 @@ function effectiveStage(b) {
   return liveData[b.id] ? liveData[b.id].label : b.stage;
 }
 
+function isEnacted(b) {
+  const s = effectiveStage(b).toLowerCase();
+  return s.includes("chaptered") || s.includes("signed") || s.includes("enrolled");
+}
+
 const stageRank = s => {
   if (!s) return 5;
   const sl = s.toLowerCase();
@@ -568,6 +608,7 @@ const statusFilters = [
     const s = effectiveStage(b).toLowerCase();
     return s.includes("floor") || s.includes("passed") || s.includes("enrolled") || s.includes("signed") || s.includes("chaptered") || s.includes("engrossed");
   }},
+  { label: "Enacted", fn: b => isEnacted(b) },
   { label: "Changed since SANDAG", fn: b => {
     const live = liveData[b.id];
     return !!live && live.label !== b.stage;
@@ -724,6 +765,49 @@ function liveRow(b) {
   </div>`;
 }
 
+function renderEnacted() {
+  const enacted = bills.filter(b => isEnacted(b));
+  const el = document.getElementById("enacted-section");
+  if (!enacted.length) { el.innerHTML = ""; return; }
+
+  const isOpen = el.querySelector(".enacted-section.open") !== null;
+  const rows = enacted.map(b => {
+    const live = liveData[b.id];
+    const statusLabel = live ? live.label : b.stage;
+    const statusCls   = live ? live.cls   : "b-passed";
+    const link = live && live.url
+      ? `<a class="live-link" href="${live.url}" target="_blank" style="font-size:11px;">leginfo ↗</a>` : "";
+    const hasNote = !!(notesData[b.id] && notesData[b.id].length > 0);
+    return `<div class="enacted-card">
+      <span class="enacted-id">${b.id}${hasNote ? '<span class="note-dot" title="Has notes"></span>' : ""}</span>
+      <div>
+        <div class="enacted-subj">${b.subj} ${catTag(b.cat)}</div>
+        <div class="enacted-desc">${b.desc}</div>
+        ${notesRow(b)}
+      </div>
+      <div class="enacted-meta">
+        ${chamberBadge(b.chamber)}
+        <span class="badge ${statusCls}">${statusLabel}</span>
+        ${link}
+      </div>
+    </div>`;
+  }).join("");
+
+  el.innerHTML = `<div class="enacted-section${isOpen ? " open" : ""}" id="enacted-wrap">
+    <div class="enacted-header" onclick="toggleEnacted()">
+      <h2>✓ Enacted Bills</h2>
+      <span class="enacted-count">${enacted.length}</span>
+      <svg class="enacted-chevron" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="enacted-body">${rows}</div>
+  </div>`;
+}
+
+function toggleEnacted() {
+  const wrap = document.getElementById("enacted-wrap");
+  if (wrap) wrap.classList.toggle("open");
+}
+
 function render() {
   const q = searchVal.toLowerCase();
   const filtered = bills.filter(b => {
@@ -770,6 +854,7 @@ function render() {
 
   document.getElementById("count-bar").textContent =
     `Showing ${filtered.length} of ${bills.length} bills · ${Object.keys(liveData).length} with live LegiScan status`;
+  renderEnacted();
   updateStats();
 }
 
@@ -777,16 +862,18 @@ function updateStats() {
   const active   = bills.filter(b => b.sandag === "Active").length;
   const inactive = bills.filter(b => b.sandag === "Inactive").length;
   const notSan   = bills.filter(b => b.sandag === null).length;
+  const enacted  = bills.filter(b => isEnacted(b)).length;
   const floor    = bills.filter(b => {
     const s = effectiveStage(b).toLowerCase();
-    return (s.includes("floor")||s.includes("passed")||s.includes("signed")||s.includes("enrolled")||s.includes("chaptered")) && b.sandag !== "Inactive";
+    return (s.includes("floor") || s.includes("passed")) && b.sandag !== "Inactive" && !isEnacted(b);
   }).length;
   document.getElementById("stats-bar").innerHTML = `
     <div class="stat"><div class="stat-n">${bills.length}</div><div class="stat-l">Total bills</div></div>
     <div class="stat"><div class="stat-n">${active}</div><div class="stat-l">Active</div></div>
     <div class="stat"><div class="stat-n">${inactive}</div><div class="stat-l">Inactive (SANDAG)</div></div>
     <div class="stat"><div class="stat-n">${notSan}</div><div class="stat-l">Not in SANDAG</div></div>
-    <div class="stat"><div class="stat-n">${floor}</div><div class="stat-l">On floor / passed</div></div>
+    <div class="stat"><div class="stat-n">${floor}</div><div class="stat-l">On floor</div></div>
+    <div class="stat" style="color:#145A32"><div class="stat-n" style="color:#145A32">${enacted}</div><div class="stat-l">Enacted</div></div>
   `;
 }
 
