@@ -110,7 +110,7 @@
   .cat-other      { background: #F1EFE8; color: #4A4840; }
   .cat-unknown    { background: #F7F6F3; color: #999; border: 0.5px solid #ddd; }
 
-  /* ── Hearing indicator ── */
+  /* ── Hearing ── */
   .hearing-row { display: flex; align-items: center; gap: 6px; font-size: 12px; flex-wrap: wrap; }
   .hearing-pill { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; flex-shrink: 0; }
   .hearing-pill.soon   { background: #FEF3C7; color: #92400E; }
@@ -122,78 +122,23 @@
   /* ── Comments ── */
   .comments-section { margin-top: 6px; }
   .comments-log { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
-  .comment-entry {
-    background: #FFFBEB; border-left: 3px solid #F59E0B;
-    border-radius: 0 4px 4px 0; padding: 6px 10px;
-  }
-  .comment-meta {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 11px; color: #999; margin-bottom: 3px;
-  }
+  .comment-entry { background: #FFFBEB; border-left: 3px solid #F59E0B; border-radius: 0 4px 4px 0; padding: 6px 10px; }
+  .comment-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #999; margin-bottom: 3px; }
   .comment-author { font-weight: 600; color: #1D3557; }
   .comment-ts { color: #bbb; }
-  .comment-delete {
-    margin-left: auto; font-size: 11px; color: #ddd; background: none;
-    border: none; cursor: pointer; padding: 0; line-height: 1;
-  }
+  .comment-delete { margin-left: auto; font-size: 11px; color: #ddd; background: none; border: none; cursor: pointer; padding: 0; line-height: 1; }
   .comment-delete:hover { color: #e53e3e; }
   .comment-text { font-size: 12.5px; color: #444; line-height: 1.55; white-space: pre-wrap; }
   .comment-composer { display: flex; flex-direction: column; gap: 5px; }
-  .comment-add-btn {
-    font-size: 12px; color: #bbb; background: none; border: 0.5px solid #e0ddd7;
-    border-radius: 4px; padding: 5px 10px; cursor: pointer; text-align: left;
-    font-family: inherit; transition: all 0.12s;
-  }
+  .comment-add-btn { font-size: 12px; color: #bbb; background: none; border: 0.5px solid #e0ddd7; border-radius: 4px; padding: 5px 10px; cursor: pointer; text-align: left; font-family: inherit; transition: all 0.12s; }
   .comment-add-btn:hover { border-color: #F59E0B; color: #92400E; background: #FFFBEB; }
-  .comment-textarea {
-    width: 100%; font-size: 12.5px; font-family: inherit;
-    border: 0.5px solid #457B9D; border-radius: 4px;
-    padding: 6px 8px; resize: vertical; min-height: 56px;
-    outline: none; background: #fff; line-height: 1.55;
-  }
+  .comment-textarea { width: 100%; font-size: 12.5px; font-family: inherit; border: 0.5px solid #457B9D; border-radius: 4px; padding: 6px 8px; resize: vertical; min-height: 56px; outline: none; background: #fff; line-height: 1.55; }
   .comment-actions { display: flex; gap: 6px; align-items: center; }
-  .comment-post, .comment-cancel-btn {
-    font-size: 11px; padding: 4px 12px; border-radius: 4px;
-    border: none; cursor: pointer; font-family: inherit;
-  }
-  .comment-post       { background: #1D3557; color: #fff; }
+  .comment-post, .comment-cancel-btn { font-size: 11px; padding: 4px 12px; border-radius: 4px; border: none; cursor: pointer; font-family: inherit; }
+  .comment-post { background: #1D3557; color: #fff; }
   .comment-post:hover { background: #457B9D; }
   .comment-cancel-btn { background: #f0ede8; color: #555; }
   .note-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; margin-left: 4px; vertical-align: middle; }
-
-  /* ── Enacted section ── */
-  .enacted-section {
-    margin: 12px 24px 0;
-    border: 1.5px solid #58D68D;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .enacted-header {
-    background: #D5F5E3; padding: 10px 16px;
-    display: flex; align-items: center; gap: 10px;
-    cursor: pointer; user-select: none;
-  }
-  .enacted-header h2 { font-size: 13px; font-weight: 600; color: #145A32; }
-  .enacted-header .enacted-count {
-    font-size: 11px; background: #145A32; color: #fff;
-    padding: 1px 8px; border-radius: 999px; font-weight: 600;
-  }
-  .enacted-header .enacted-chevron {
-    margin-left: auto; width: 16px; height: 16px;
-    stroke: #145A32; fill: none; transition: transform 0.18s;
-  }
-  .enacted-section.open .enacted-chevron { transform: rotate(180deg); }
-  .enacted-body { display: none; background: #fff; }
-  .enacted-section.open .enacted-body { display: block; }
-  .enacted-card {
-    padding: 10px 16px; border-top: 0.5px solid #D5F5E3;
-    display: grid; grid-template-columns: 80px 1fr auto;
-    gap: 8px 14px; align-items: start;
-  }
-  .enacted-id   { font-weight: 600; font-size: 13px; color: #145A32; white-space: nowrap; }
-  .enacted-subj { font-size: 13px; font-weight: 500; color: #1a1a18; }
-  .enacted-desc { font-size: 12px; color: #555; line-height: 1.55; margin-top: 3px; }
-  .enacted-meta { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
 
   .no-results { padding: 40px 32px; text-align: center; color: #999; font-size: 14px; }
 
@@ -231,14 +176,13 @@
 </div>
 
 <div class="stats-bar" id="stats-bar"></div>
-<div id="enacted-section"></div>
 <div class="count-bar"  id="count-bar"></div>
 <div class="bill-list"  id="bill-list"></div>
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
 const LEGISCAN_KEY = "e1b55064872be319c9599280021f5184";
-const CACHE_KEY    = "hsng_bills_legiscan_v4";
+const CACHE_KEY    = "hsng_bills_legiscan_v6";
 const NOTES_KEY    = "hsng_bills_comments_v1";
 const HEARING_KEY  = "hsng_bills_hearings_v1";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -319,7 +263,7 @@ const bills = [
   { id:"AB-2676", subj:"Housing Crisis Act of 2019: moratoria and capacity reductions",                  chamber:"Senate",   stage:"Pending Referral",                                sandag:"Active",   cat:"STREAM",   desc:"Would strengthen the Housing Crisis Act of 2019 by expanding the moratorium prohibition to include a city's sphere of influence, clarifying that voter initiatives extending restrictions require HCD approval, and establishing a 3-year statute of limitations." },
   { id:"AB-2702", subj:"Residential care facilities on faith-based lands",                               chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"OTHER",    desc:"Would establish a streamlined approval pathway for residential care facilities on land owned by religious institutions, with density bonus eligibility and reduced parking requirements near transit." },
   { id:"AB-2741", subj:"Housing element: overlay zones and substantial compliance",                      chamber:"Assembly", stage:"In Committee – Local Government",                  sandag:"Inactive", cat:"RHNA",     desc:"Would clarify that overlay zones and similar zoning tools may satisfy housing element sites inventory requirements, and provide that a housing element found out of compliance remains substantially compliant for up to 275 days after a court order." },
-  { id:"SB-417",  subj:"Affordable Housing Bond Act of 2026: $10B ballot measure",                      chamber:"Assembly", stage:"Floor – Third Reading",                           sandag:"Active",   cat:"FUNDING",  desc:"Would authorize a $10 billion affordable housing bond to be on the November 2026 ballot, funding rental, homeownership, and farmworker housing programs." },
+  { id:"SB-417",  subj:"Affordable Housing Bond Act of 2026: $10B ballot measure",                      chamber:"Assembly", stage:"Floor – Third Reading",                           sandag:"Active",   cat:"FUNDING",  desc:"Would authorize a $11.25 billion veteran and affordable housing bond measure to be on the November 2026 ballot, funding rental, homeownership, and farmworker housing programs." },
   { id:"SB-457",  subj:"Housing element: committed assistance and realistic capacity formula",           chamber:"Assembly", stage:"In Committee – Local Government",                 sandag:null,       cat:"UNKNOWN",  desc:"Not included in the SANDAG June 2026 tracking document. Tracked in Ascent source only." },
   { id:"SB-677",  subj:"HAA: tax-exempt bonds and subdivision map appeals",                              chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Active",   cat:"STREAM",   desc:"Would expand the HAA definition of \"disapprove\" to include failure to act on tax-exempt private activity bonds for qualifying housing projects, and limit certain appeals of tentative and final maps." },
   { id:"SB-722",  subj:"SB 79: mobilehome and RV park site exemptions",                                 chamber:"Assembly", stage:"In Committee – Appropriations",                   sandag:"Active",   cat:"SB79",     desc:"Would exempt sites governed under the Mobilehome Residency Law, Recreational Vehicle Park Occupancy Law, Mobilehome Parks Act, or Special Occupancy Parks Act from SB 79. Urgency statute." },
@@ -341,14 +285,23 @@ const bills = [
   { id:"SB-1318", subj:"Coastal resources: LCP: short-term rental restrictions",                       chamber:"Senate",   stage:"In Committee – Appropriations",                   sandag:"Inactive", cat:"OTHER",    desc:"Would require Coastal Commission to approve coastal permits or LCP amendments that restrict or prohibit non-owner-occupied short-term rentals if a jurisdiction demonstrates the action is needed to address housing needs." },
   { id:"SB-1361", subj:"SB 79: local governments and transit project approvals",                       chamber:"Assembly", stage:"In Committee – Local Government",                  sandag:"Active",   cat:"SB79",     desc:"Prohibits local governments with existing or planned TOD stops from interfering with a transit project's approval, including reducing transit service or withholding support for transit funding." },
   { id:"SB-1383", subj:"Density bonus: labor standards not waivable via concessions",                  chamber:"Assembly", stage:"In Committee – Housing and Community Development", sandag:"Inactive", cat:"DENSITY",  desc:"Would clarify that an applicant cannot use density bonus incentives and concessions to waive or modify labor requirements." },
+  { id:"AB-660",  subj:"Post-entitlement permits: plan check rounds and HAA violations (earlier version)", chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Inactive", cat:"STREAM",  desc:"Would cap building permit plan check reviews at 2 rounds; shorten appeal timelines from 60/90 to 30/45 business days for projects with 25 or fewer / 26 or more units; allow applicants to seek a writ of mandate if an agency fails to act; and make violations of postentitlement permit provisions violations of the Housing Accountability Act." },
+  { id:"AB-906",  subj:"Housing element: AFFH requirements restructuring",                             chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Inactive", cat:"RHNA",    desc:"Would restructure AFFH requirements in housing elements: removes the standalone site inventory analysis of AFFH but requires sites to be distributed throughout the jurisdiction in a manner that affirmatively furthers fair housing, with rezoning required if the inventory doesn't meet that standard; requires a publicly available AFFH assessment at least one year before the next housing element adoption deadline; and requires HCD to develop an online tool to evaluate whether a jurisdiction's site distribution meets AFFH requirements." },
+  { id:"AB-1206", subj:"Preapproval programs: local agencies: housing plans",                          chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Inactive", cat:"STREAM",  desc:"Would require local agencies to create preapproval programs for single-family and multifamily housing plans." },
+  { id:"AB-1457", subj:"AB 1457 (Bryan)",                                                              chamber:"Assembly", stage:"In Committee – Housing",                          sandag:"Active",   cat:"OTHER",   desc:"No description available in SANDAG September 2026 tracking document." },
+  { id:"SB-569",  subj:"Bikeways: removal or modification: State General Fund projects",               chamber:"Senate",   stage:"In Committee – Transportation",                   sandag:"Active",   cat:"OTHER",   desc:"Would prevent a city, county, regional, or other local agency from removing or modifying a bikeway that was built using the State General Fund in a way that reduces safety, accessibility, or mobility of bicyclists or pedestrians. This restriction would apply for a minimum of 20 years from the date of allocation or its actual useful life documented in the project design or local building or permit application materials." },
+  { id:"SB-598",  subj:"CEQA: building height: significant environmental impact",                      chamber:"Senate",   stage:"In Committee – Environmental Quality",             sandag:"Active",   cat:"OTHER",   desc:"Would prohibit CEQA from considering the environmental impacts that are associated with increased building height alone as significant impacts on the environment, if a project meets specified conditions." },
+  { id:"SB-1216", subj:"HCD housing leadership designation for jurisdictions",                         chamber:"Senate",   stage:"In Committee – Housing",                          sandag:"Inactive", cat:"OTHER",   desc:"Would establish a new HCD 'housing leadership designation' for jurisdictions that meet specified APR reporting and housing production requirements. Designated jurisdictions would receive certain regulatory flexibilities, including modified housing element substantial compliance procedures and exemptions from specified housing element analyses." },
   { id:"SB-1426", subj:"Housing element annual progress report: organizational updates",                chamber:"Senate",   stage:"Passed – Enrollment",                             sandag:"Active",   cat:"RHNA",     desc:"Would make nonsubstantive and organizational updates to housing element annual progress report requirements, consolidating reporting provisions into Gov. Code Section 65400. Takes effect immediately as an urgency statute." },
 ];
 
-// ── LegiScan direct API calls ─────────────────────────────────────────────────
-let liveData = {};
-let notesData = {};    // billId -> array of {id, text, ts}
-let hearingData = {}; // billId -> { date, committee } | null
+// ── Data stores ───────────────────────────────────────────────────────────────
+let liveData    = {};
+let notesData   = {};
+let hearingData = {};
+let billIdMap   = {};
 
+// ── LegiScan API ──────────────────────────────────────────────────────────────
 async function legiScanGet(params) {
   const qs = new URLSearchParams({ key: LEGISCAN_KEY, ...params });
   const resp = await fetch(`https://api.legiscan.com/?${qs}`);
@@ -359,89 +312,17 @@ async function legiScanGet(params) {
 }
 
 async function getCASessionId() {
-  // Find the current CA 2025-2026 regular session ID dynamically
   const data = await legiScanGet({ op: "getSessionList", state: "CA" });
   const sessions = data.sessions || [];
-  // Prefer session with "2025-2026 Regular Session" in name
-  const match = sessions.find(s =>
-    s.session_name && /2025.?2026/i.test(s.session_name) && /regular/i.test(s.session_name)
-  ) || sessions.find(s =>
-    s.session_name && /2025.?2026/i.test(s.session_name)
-  ) || sessions[0];
+  const match =
+    sessions.find(s => s.session_name && /2025.?2026/i.test(s.session_name) && /regular/i.test(s.session_name)) ||
+    sessions.find(s => s.session_name && /2025.?2026/i.test(s.session_name)) ||
+    sessions[0];
   if (!match) throw new Error("Could not find CA 2025-2026 session");
   return match.session_id;
 }
 
-
-// bill_id lookup map — populated after getMasterList
-let billIdMap = {}; // "AB-748" -> legiscan bill_id integer
-
-async function fetchHearing(billId) {
-  // Called on-demand; uses getBill which includes hearing field
-  if (hearingData.hasOwnProperty(billId)) return;
-  try {
-    const lsId = billIdMap[billId];
-    if (!lsId) { hearingData[billId] = null; saveHearings(); return; }
-    const data = await legiScanGet({ op: "getBill", id: lsId });
-    const bill = data.bill || {};
-    // LegiScan returns hearing as array of objects with date, time, description, location
-    const hearings = bill.hearing || bill.hearings || bill.calendar || [];
-    const today = new Date(); today.setHours(0,0,0,0);
-    const upcoming = hearings
-      .map(h => {
-        const d = parseHearingDate(h.date || "");
-        return { date: h.date || null, time: h.time || "", location: h.location || "", committee: h.description || h.committee || "", d };
-      })
-      .filter(h => h.d && !isNaN(h.d) && h.d >= today)
-      .sort((a, b) => a.d - b.d);
-    hearingData[billId] = upcoming.length > 0
-      ? { date: upcoming[0].date, time: upcoming[0].time, location: upcoming[0].location, committee: upcoming[0].committee, source: "api" }
-      : null;
-    saveHearings();
-    render();
-  } catch(e) {
-    hearingData[billId] = null;
-    saveHearings();
-  }
-}
-
-// After getMasterList, store bill_id map and bulk-fetch hearings for all tracked bills
-// We fetch in small batches to stay within rate limits — 2 calls/sec
-async function fetchAllHearings() {
-  const toFetch = bills.filter(b => !hearingData.hasOwnProperty(b.id) && billIdMap[b.id]);
-  if (!toFetch.length) return;
-  setSyncStatus("syncing", `Fetching hearing dates (0/${toFetch.length})…`);
-  let done = 0;
-  const BATCH = 3;
-  for (let i = 0; i < toFetch.length; i += BATCH) {
-    const chunk = toFetch.slice(i, i + BATCH);
-    await Promise.all(chunk.map(b => fetchHearing(b.id)));
-    done += chunk.length;
-    setSyncStatus("syncing", `Fetching hearing dates (${done}/${toFetch.length})…`);
-    if (i + BATCH < toFetch.length) await new Promise(r => setTimeout(r, 600));
-  }
-  saveHearings();
-  setSyncStatus("ok", `Live · hearings updated`);
-  render();
-}
-
-function parseAllHearings() {
-  // No-op — hearings now come from API, not last_action parsing
-}
-
-function saveHearings() {
-  try { localStorage.setItem(HEARING_KEY, JSON.stringify(hearingData)); } catch(e) {}
-}
-
-function loadHearings() {
-  try {
-    const raw = localStorage.getItem(HEARING_KEY);
-    if (raw) hearingData = JSON.parse(raw);
-  } catch(e) {}
-}
-
 async function syncAllBills(force = false) {
-  // Check 24hr cache
   try {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!force && raw) {
@@ -450,6 +331,7 @@ async function syncAllBills(force = false) {
         liveData = cache.data;
         if (cache.billIdMap) billIdMap = cache.billIdMap;
         setSyncStatus("ok", `Live · updated ${formatAge(Date.now() - cache.timestamp)}`);
+        rebuildStatusFilters();
         render();
         scheduleNextRefresh(CACHE_TTL_MS - (Date.now() - cache.timestamp));
         return;
@@ -461,54 +343,63 @@ async function syncAllBills(force = false) {
   document.getElementById("refresh-btn").disabled = true;
 
   try {
-    // Step 1: get correct session ID for CA 2025-2026
     const sessionId = await getCASessionId();
-
     setSyncStatus("syncing", "Fetching bill list from LegiScan…");
 
-    // Step 2: getMasterList — single call returns all bills in the session
     const masterData = await legiScanGet({ op: "getMasterList", id: sessionId });
-    const masterList = masterData.masterlist || {};
 
-    // Build lookup: "AB 748" -> master entry
+    // getMasterList returns { masterlist: { "0": {session_id,...}, "1": {bill_id, number,...}, ... } }
+    // Key "0" is session metadata (no bill_id/number), numbered keys are bills
+    const rawMaster = masterData.masterlist || masterData.bills || {};
+    console.log("[LegiScan] getMasterList keys:", Object.keys(rawMaster).slice(0,5), "total:", Object.keys(rawMaster).length);
+
     const masterMap = {};
-    Object.values(masterList).forEach(item => {
-      if (item && item.number) {
-        masterMap[item.number.toUpperCase().trim()] = item;
+    Object.values(rawMaster).forEach(item => {
+      if (item && typeof item === "object" && item.number) {
+        // Store under the exact number as returned, uppercased
+        masterMap[String(item.number).toUpperCase().trim()] = item;
       }
     });
+    console.log("[LegiScan] masterMap entries:", Object.keys(masterMap).length);
 
-    // Step 3: match our 69 bills, also store bill_id for hearing lookups
+    // Debug: log a few masterMap keys to understand format
+    const sampleKeys = Object.keys(masterMap).slice(0, 10);
+    console.log("[LegiScan] masterMap sample keys:", sampleKeys, "total:", Object.keys(masterMap).length);
+
     const results = {};
     bills.forEach(b => {
-      // Our IDs: "AB-748" -> try "AB 748" and "AB748"
-      const keySpaced = b.id.replace("-", " ").toUpperCase();
-      const keyPlain  = b.id.replace("-", "").toUpperCase();
-      const item = masterMap[keySpaced] || masterMap[keyPlain];
+      // LegiScan format is "AB748", "SB1426" — no space, no padding
+      const [type, num] = b.id.split("-");
+      const key = `${type}${num}`.toUpperCase();
+      const item = masterMap[key];
+
       if (item) {
         const prog = PROGRESS[item.progress] || { label: "In Committee", cls: "b-committee" };
+        const status = statusFromAction(item.last_action, prog.label, prog.cls);
         results[b.id] = {
-          label:          prog.label,
-          cls:            prog.cls,
+          label:          status.label,
+          cls:            status.cls,
           lastAction:     item.last_action      || "",
           lastActionDate: item.last_action_date  || "",
           progress:       item.progress,
           url:            item.url               || "",
         };
         if (item.bill_id) billIdMap[b.id] = item.bill_id;
+      } else {
+        console.warn("[LegiScan] no match for", b.id, "tried:", key);
       }
     });
 
     liveData = results;
     const matched = Object.keys(results).length;
+    console.log("[LegiScan] matched", matched, "of", bills.length, "bills");
     localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: results, billIdMap }));
     setSyncStatus("ok", `Live · ${matched} of ${bills.length} bills matched`);
+    rebuildStatusFilters();
     scheduleNextRefresh(CACHE_TTL_MS);
-    // Now fetch hearing dates for all matched bills
     await fetchAllHearings();
 
   } catch(err) {
-    console.error("LegiScan sync error:", err);
     setSyncStatus("error", `Sync failed: ${err.message}`);
   }
 
@@ -516,15 +407,80 @@ async function syncAllBills(force = false) {
   render();
 }
 
+function forceRefresh() {
+  localStorage.removeItem(CACHE_KEY);
+  localStorage.removeItem(HEARING_KEY);
+  hearingData = {};
+  billIdMap   = {};
+  syncAllBills(true);
+}
 
+function scheduleNextRefresh(remainingMs) {
+  const now   = new Date();
+  const next3 = new Date(now);
+  next3.setHours(3, 0, 0, 0);
+  if (next3 <= now) next3.setDate(next3.getDate() + 1);
+  setTimeout(() => syncAllBills(true), Math.min(remainingMs, next3 - now));
+}
+
+// ── Hearing fetch ─────────────────────────────────────────────────────────────
+async function fetchHearing(billId) {
+  if (hearingData.hasOwnProperty(billId)) return;
+  try {
+    const lsId = billIdMap[billId];
+    if (!lsId) { hearingData[billId] = null; saveHearings(); return; }
+    const data = await legiScanGet({ op: "getBill", id: lsId });
+    const bill = data.bill || {};
+    const hearings = bill.hearing || bill.hearings || bill.calendar || [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = hearings
+      .map(h => {
+        const d = parseHearingDate(h.date || "");
+        return { date: h.date || null, time: h.time || "", committee: h.description || h.committee || "", d };
+      })
+      .filter(h => h.d && h.d >= today)
+      .sort((a, b) => a.d - b.d);
+    hearingData[billId] = upcoming.length > 0
+      ? { date: upcoming[0].date, time: upcoming[0].time, committee: upcoming[0].committee }
+      : null;
+    saveHearings();
+    render();
+  } catch(e) {
+    hearingData[billId] = null;
+    saveHearings();
+  }
+}
+
+async function fetchAllHearings() {
+  const toFetch = bills.filter(b => !hearingData.hasOwnProperty(b.id) && billIdMap[b.id]);
+  if (!toFetch.length) return;
+  setSyncStatus("syncing", `Fetching hearing dates (0/${toFetch.length})…`);
+  let done = 0;
+  for (let i = 0; i < toFetch.length; i += 3) {
+    const chunk = toFetch.slice(i, i + 3);
+    await Promise.all(chunk.map(b => fetchHearing(b.id)));
+    done += chunk.length;
+    setSyncStatus("syncing", `Fetching hearing dates (${done}/${toFetch.length})…`);
+    if (i + 3 < toFetch.length) await new Promise(r => setTimeout(r, 600));
+  }
+  saveHearings();
+  setSyncStatus("ok", `Live · hearings updated`);
+  render();
+}
+
+function saveHearings() {
+  try { localStorage.setItem(HEARING_KEY, JSON.stringify(hearingData)); } catch(e) {}
+}
+
+function loadHearings() {
+  try { const r = localStorage.getItem(HEARING_KEY); if (r) hearingData = JSON.parse(r); } catch(e) {}
+}
+
+// ── Comments ──────────────────────────────────────────────────────────────────
 function addComment(billId, text) {
   if (!text.trim()) return;
   if (!notesData[billId]) notesData[billId] = [];
-  notesData[billId].push({
-    id:   Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-    text: text.trim(),
-    ts:   new Date().toISOString(),
-  });
+  notesData[billId].push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), text: text.trim(), ts: new Date().toISOString() });
   try { localStorage.setItem(NOTES_KEY, JSON.stringify(notesData)); } catch(e) {}
   render();
 }
@@ -532,16 +488,13 @@ function addComment(billId, text) {
 function deleteComment(billId, commentId) {
   if (!notesData[billId]) return;
   notesData[billId] = notesData[billId].filter(c => c.id !== commentId);
-  if (notesData[billId].length === 0) delete notesData[billId];
+  if (!notesData[billId].length) delete notesData[billId];
   try { localStorage.setItem(NOTES_KEY, JSON.stringify(notesData)); } catch(e) {}
   render();
 }
 
 function loadNotes() {
-  try {
-    const raw = localStorage.getItem(NOTES_KEY);
-    if (raw) notesData = JSON.parse(raw);
-  } catch(e) {}
+  try { const r = localStorage.getItem(NOTES_KEY); if (r) notesData = JSON.parse(r); } catch(e) {}
 }
 
 function formatTs(iso) {
@@ -550,42 +503,70 @@ function formatTs(iso) {
     + " " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
-function forceRefresh() {
-  localStorage.removeItem(CACHE_KEY);
-  syncAllBills(true);
-}
-
-function scheduleNextRefresh(remainingMs) {
-  // Also schedule at next 3 AM
-  const now   = new Date();
-  const next3 = new Date(now);
-  next3.setHours(3, 0, 0, 0);
-  if (next3 <= now) next3.setDate(next3.getDate() + 1);
-  const delay = Math.min(remainingMs, next3 - now);
-  setTimeout(() => syncAllBills(true), delay);
-}
-
 function setSyncStatus(state, label) {
   document.getElementById("sync-dot").className = "sync-dot " + state;
   document.getElementById("sync-label").textContent = label;
 }
 
 function formatAge(ms) {
-  const mins = Math.floor(ms / 60000);
-  const hrs  = Math.floor(mins / 60);
-  if (hrs > 0)  return `${hrs}h ago`;
+  const mins = Math.floor(ms / 60000), hrs = Math.floor(mins / 60);
+  if (hrs > 0) return `${hrs}h ago`;
   if (mins > 0) return `${mins}m ago`;
   return "just now";
 }
 
-// ── Rendering ─────────────────────────────────────────────────────────────────
-function effectiveStage(b) {
-  return liveData[b.id] ? liveData[b.id].label : b.stage;
+// Parse a more accurate status from last_action text when progress code is stale
+function statusFromAction(lastAction, progressLabel, progressCls) {
+  if (!lastAction) return { label: progressLabel, cls: progressCls };
+  const a = lastAction.toLowerCase();
+
+  if (/chaptered by secretary of state/i.test(lastAction))
+    return { label: "Chaptered", cls: "b-signed" };
+  if (/signed by (the )?governor/i.test(lastAction))
+    return { label: "Signed by Governor", cls: "b-signed" };
+  if (/enrolled and presented to the governor/i.test(lastAction))
+    return { label: "Enrolled", cls: "b-engrossed" };
+  if (/enrolled/i.test(lastAction))
+    return { label: "Enrolled", cls: "b-engrossed" };
+  if (/vetoed by (the )?governor/i.test(lastAction))
+    return { label: "Vetoed", cls: "b-vetoed" };
+  if (/failed (the )?passage/i.test(lastAction) || /died/i.test(lastAction))
+    return { label: "Failed", cls: "b-inactive" };
+  if (/read third time.*passed/i.test(lastAction) || /passed.*third reading/i.test(lastAction))
+    return { label: "Passed – Third Reading", cls: "b-passed" };
+  if (/read third time/i.test(lastAction))
+    return { label: "Floor – Third Reading", cls: "b-floor" };
+  if (/read second time/i.test(lastAction))
+    return { label: "Floor – Second Reading", cls: "b-floor" };
+
+  // Fall back to progress code
+  return { label: progressLabel, cls: progressCls };
 }
 
-function isEnacted(b) {
+
+function effectiveStage(b) { return liveData[b.id] ? liveData[b.id].label : b.stage; }
+
+// A bill is considered live-inactive if LegiScan says it's dead/failed/vetoed,
+// OR if SANDAG flagged it inactive AND live data doesn't show it has moved forward
+function liveIsInactive(b) {
   const s = effectiveStage(b).toLowerCase();
-  return s.includes("chaptered") || s.includes("signed") || s.includes("enrolled");
+  if (s.includes("dead") || s.includes("failed") || s.includes("vetoed")) return true;
+  // SANDAG inactive + no forward-moving live status = still inactive
+  if (b.sandag === "Inactive") {
+    const live = liveData[b.id];
+    if (!live) return true;
+    // If live shows something substantive (enrolled, chaptered, passed, floor) — not inactive
+    if (s.includes("chaptered") || s.includes("signed") || s.includes("enrolled") ||
+        s.includes("passed") || s.includes("floor") || s.includes("engrossed")) return false;
+    return true;
+  }
+  return false;
+}
+
+// A bill is considered live-active if it has a live status and isn't inactive
+function liveIsActive(b) {
+  if (b.sandag === null) return false; // "Not in SANDAG" — neutral
+  return !liveIsInactive(b);
 }
 
 const stageRank = s => {
@@ -599,65 +580,38 @@ const stageRank = s => {
   return 3;
 };
 
-const statusFilters = [
-  { label: "All",           fn: () => true },
-  { label: "Active",        fn: b => b.sandag === "Active" },
-  { label: "Inactive",      fn: b => b.sandag === "Inactive" },
-  { label: "Not in SANDAG", fn: b => b.sandag === null },
-  { label: "On Floor",      fn: b => {
-    const s = effectiveStage(b).toLowerCase();
-    return s.includes("floor") || s.includes("passed") || s.includes("enrolled") || s.includes("signed") || s.includes("chaptered") || s.includes("engrossed");
-  }},
-  { label: "Enacted", fn: b => isEnacted(b) },
-  { label: "Changed since SANDAG", fn: b => {
-    const live = liveData[b.id];
-    return !!live && live.label !== b.stage;
-  }},
-  { label: "Has Hearing", fn: b => {
-    return hearingData.hasOwnProperty(b.id) && hearingData[b.id] !== null;
-  }},
-  { label: "Has Notes", fn: b => !!(notesData[b.id] && notesData[b.id].length > 0) },
-  { label: "Senate",   fn: b => b.chamber === "Senate"   },
-  { label: "Assembly", fn: b => b.chamber === "Assembly" },
-];
-
-const catFilterOrder = ["SB79","DENSITY","STREAM","ADU","RHNA","FUNDING","OTHER"];
-let currentStatus = "All", currentCat = "All", searchVal = "";
+function chamberBadge(c) { return `<span class="badge ${c === "Senate" ? "b-senate" : "b-assembly"}">${c}</span>`; }
+function catTag(k) { const c = CAT[k] || CAT.OTHER; return `<span class="cat ${c.cls}">${c.label}</span>`; }
 
 function stageBadge(b) {
-  if (b.sandag === "Inactive") return '<span class="badge b-inactive">Inactive</span>';
-  if (b.sandag === null)       return '<span class="badge b-notsandag">Not in SANDAG</span>';
-  const live  = liveData[b.id];
+  if (b.sandag === null) return '<span class="badge b-notsandag">Not in SANDAG</span>';
+  const live = liveData[b.id];
   const label = live ? live.label : b.stage;
   const cls   = live ? live.cls   : "b-committee";
-  return `<span class="badge ${cls}">${label}</span>`;
+  // Add a secondary "SANDAG: Inactive" indicator if SANDAG flagged it but live shows movement
+  const sandagInactive = b.sandag === "Inactive" && !liveIsInactive(b);
+  return `<span class="badge ${cls}">${label}</span>${sandagInactive ? ' <span class="badge" style="background:#FEF3C7;color:#92400E;font-size:10px">SANDAG: inactive</span>' : ''}`;
 }
 
-function chamberBadge(c) {
-  return `<span class="badge ${c === "Senate" ? "b-senate" : "b-assembly"}">${c}</span>`;
+function liveRow(b) {
+  const live = liveData[b.id];
+  if (!live) return "";
+  const dateStr = live.lastActionDate ? ` · ${live.lastActionDate}` : "";
+  const action  = live.lastAction ? `<span class="live-date">${live.lastAction}${dateStr}</span>` : "";
+  const link    = live.url ? ` <a class="live-link" href="${live.url}" target="_blank">leginfo ↗</a>` : "";
+  return `<div class="live-row"><span class="live-pill">LIVE</span><span class="live-stage">${live.label}</span>${action}${link}</div>`;
 }
-
-function catTag(k) {
-  const c = CAT[k] || CAT.OTHER;
-  return `<span class="cat ${c.cls}">${c.label}</span>`;
-}
-
 
 function parseHearingDate(dateStr) {
   if (!dateStr) return null;
-  // Normalize to YYYY-MM-DD if needed
-  // Handle "YYYY-MM-DD", "MM/DD/YYYY", "Month DD YYYY", "Month DD, YYYY"
   let d = null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr.trim())) {
-    // Already ISO — parse as local date to avoid UTC shift
-    const [y, m, day] = dateStr.trim().split("-").map(Number);
-    d = new Date(y, m - 1, day);
+    const [y,m,day] = dateStr.trim().split("-").map(Number);
+    d = new Date(y, m-1, day);
   } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr.trim())) {
-    const [m, day, y] = dateStr.trim().split("/").map(Number);
-    d = new Date(y, m - 1, day);
-  } else {
-    d = new Date(dateStr);
-  }
+    const [m,day,y] = dateStr.trim().split("/").map(Number);
+    d = new Date(y, m-1, day);
+  } else { d = new Date(dateStr); }
   return (!d || isNaN(d.getTime())) ? null : d;
 }
 
@@ -665,27 +619,18 @@ function hearingRow(b) {
   if (!hearingData.hasOwnProperty(b.id)) return "";
   const h = hearingData[b.id];
   if (!h || !h.date) return "";
-
   const hDate = parseHearingDate(h.date);
   if (!hDate) return "";
-
-  const today = new Date(); today.setHours(0,0,0,0);
-  hDate.setHours(0,0,0,0);
-  const diffDays = Math.round((hDate - today) / 86400000);
-  if (diffDays < 0) return ""; // past hearing, don't show
-
-  let pillClass = "future", pillLabel = `IN ${diffDays}d`;
-  if (diffDays === 0)     { pillClass = "today"; pillLabel = "TODAY"; }
-  else if (diffDays <= 7) { pillClass = "soon";  }
-
-  const dateStr = hDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const today = new Date(); today.setHours(0,0,0,0); hDate.setHours(0,0,0,0);
+  const diff = Math.round((hDate - today) / 86400000);
+  if (diff < 0) return "";
+  let cls = "future", label = `IN ${diff}d`;
+  if (diff === 0)     { cls = "today"; label = "TODAY"; }
+  else if (diff <= 7) { cls = "soon"; }
+  const dateStr = hDate.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
   const timeStr = h.time ? ` · ${h.time}` : "";
-  const cmteStr = h.committee ? ` · ${h.committee}` : "";
-  return `<div class="hearing-row">
-    <span class="hearing-pill ${pillClass}">${pillLabel}</span>
-    <span class="hearing-date">${dateStr}${timeStr}</span>
-    <span class="hearing-cmte">${cmteStr}</span>
-  </div>`;
+  const cmte    = h.committee ? ` · ${h.committee}` : "";
+  return `<div class="hearing-row"><span class="hearing-pill ${cls}">${label}</span><span class="hearing-date">${dateStr}${timeStr}</span><span class="hearing-cmte">${cmte}</span></div>`;
 }
 
 function notesRow(b) {
@@ -699,15 +644,12 @@ function notesRow(b) {
       </div>
       <div class="comment-text">${escHtml(c.text)}</div>
     </div>`).join("");
-
   return `<div class="comments-section">
-    ${comments.length > 0 ? `<div class="comments-log">${logHtml}</div>` : ""}
+    ${comments.length ? `<div class="comments-log">${logHtml}</div>` : ""}
     <div class="comment-composer">
-      <button class="comment-add-btn" id="comment-btn-${b.id}"
-        onclick="openCommentBox('${b.id}')">＋ Add comment…</button>
-      <div style="display:none" id="comment-box-${b.id}">
-        <textarea class="comment-textarea" id="comment-ta-${b.id}"
-          placeholder="Add a comment…" onkeydown="commentKeydown(event,'${b.id}')"></textarea>
+      <button class="comment-add-btn" id="comment-btn-${b.id}" onclick="openCommentBox('${b.id}')">＋ Add comment…</button>
+      <div style="display:none;flex-direction:column;gap:5px" id="comment-box-${b.id}">
+        <textarea class="comment-textarea" id="comment-ta-${b.id}" placeholder="Add a comment…" onkeydown="commentKeydown(event,'${b.id}')"></textarea>
         <div class="comment-actions">
           <button class="comment-post" onclick="postComment('${b.id}')">Post</button>
           <button class="comment-cancel-btn" onclick="closeCommentBox('${b.id}')">Cancel</button>
@@ -717,197 +659,236 @@ function notesRow(b) {
   </div>`;
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-function escAttr(s) { return String(s).replace(/'/g,"\'"); }
+function escHtml(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
 
 function openCommentBox(billId) {
-  document.getElementById("comment-btn-" + billId).style.display = "none";
-  document.getElementById("comment-box-" + billId).style.display = "flex";
-  document.getElementById("comment-box-" + billId).style.flexDirection = "column";
-  document.getElementById("comment-box-" + billId).style.gap = "5px";
-  const ta = document.getElementById("comment-ta-" + billId);
-  ta.focus();
-
+  document.getElementById("comment-btn-"+billId).style.display = "none";
+  const box = document.getElementById("comment-box-"+billId);
+  box.style.display = "flex"; box.style.flexDirection = "column"; box.style.gap = "5px";
+  document.getElementById("comment-ta-"+billId).focus();
 }
-
 function closeCommentBox(billId) {
-  document.getElementById("comment-box-" + billId).style.display = "none";
-  document.getElementById("comment-btn-" + billId).style.display = "";
-  document.getElementById("comment-ta-" + billId).value = "";
+  document.getElementById("comment-box-"+billId).style.display = "none";
+  document.getElementById("comment-btn-"+billId).style.display = "";
+  document.getElementById("comment-ta-"+billId).value = "";
+}
+function postComment(billId) { const v = document.getElementById("comment-ta-"+billId).value; if (v.trim()) addComment(billId, v); }
+function commentKeydown(e, billId) { if (e.key==="Enter" && (e.metaKey||e.ctrlKey)) { e.preventDefault(); postComment(billId); } }
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+
+// Fixed single-select filters
+const fixedFilters = [
+  { label: "All",                  fn: () => true },
+  { label: "Active",               fn: b => liveIsActive(b) },
+  { label: "Inactive",             fn: b => liveIsInactive(b) },
+  { label: "Not in SANDAG",        fn: b => b.sandag === null },
+  { label: "Changed since SANDAG", fn: b => { const live = liveData[b.id]; return !!live && live.label !== b.stage; }},
+  { label: "Has Hearing",          fn: b => hearingData.hasOwnProperty(b.id) && hearingData[b.id] !== null },
+  { label: "Has Notes",            fn: b => !!(notesData[b.id] && notesData[b.id].length > 0) },
+  { label: "Senate",               fn: b => b.chamber === "Senate" },
+  { label: "Assembly",             fn: b => b.chamber === "Assembly" },
+];
+
+// Dynamic live-status filters — multi-select
+let liveStatusFilters = [];
+let activeFixedFilter = "All";       // single-select
+let activeStatusLabels = new Set();  // multi-select live statuses
+
+function buildLiveStatusFilters() {
+  const seen = new Set();
+  bills.forEach(b => {
+    const live = liveData[b.id];
+    if (live && live.label) seen.add(live.label);
+  });
+
+  const order = [
+    "Chaptered","Signed by Governor","Signed","Enrolled",
+    "Passed – Third Reading","Passed","Engrossed",
+    "Floor – Third Reading","Floor – Second Reading",
+    "In Committee","Introduced","Refer","Pre-Filed",
+    "Failed","Vetoed","Dead",
+  ];
+  const sorted = [...seen].sort((a, b) => {
+    const ai = order.findIndex(o => a === o || a.includes(o));
+    const bi = order.findIndex(o => b === o || b.includes(o));
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+
+  liveStatusFilters = sorted.map(label => ({ label }));
 }
 
-function postComment(billId) {
-  const val = document.getElementById("comment-ta-" + billId).value;
-  if (!val.trim()) return;
-  addComment(billId, val);
-}
-
-function commentKeydown(e, billId) {
-  // Cmd/Ctrl+Enter to post
-  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-    e.preventDefault();
-    postComment(billId);
+function toggleStatusLabel(label) {
+  if (activeStatusLabels.has(label)) {
+    activeStatusLabels.delete(label);
+  } else {
+    activeStatusLabels.add(label);
+    activeFixedFilter = "All"; // clear fixed filter when selecting a live status
   }
 }
 
-function liveRow(b) {
-  const live = liveData[b.id];
-  if (!live) return "";
-  const dateStr = live.lastActionDate ? ` · ${live.lastActionDate}` : "";
-  const action  = live.lastAction ? `<span class="live-date">${live.lastAction}${dateStr}</span>` : "";
-  const link    = live.url ? ` <a class="live-link" href="${live.url}" target="_blank">leginfo ↗</a>` : "";
-  return `<div class="live-row">
-    <span class="live-pill">LIVE</span>
-    <span class="live-stage">${live.label}</span>
-    ${action}${link}
-  </div>`;
+function setFixedFilter(label) {
+  activeFixedFilter = label;
+  activeStatusLabels.clear(); // clear live status selections
 }
 
-function renderEnacted() {
-  const enacted = bills.filter(b => isEnacted(b));
-  const el = document.getElementById("enacted-section");
-  if (!enacted.length) { el.innerHTML = ""; return; }
+const catFilterOrder = ["SB79","DENSITY","STREAM","ADU","RHNA","FUNDING","OTHER"];
+let currentCat = "All", searchVal = "";
 
-  const isOpen = el.querySelector(".enacted-section.open") !== null;
-  const rows = enacted.map(b => {
+function rebuildStatusFilters() {
+  buildLiveStatusFilters();
+  const bar = document.getElementById("status-filters");
+  bar.innerHTML = "";
+
+  // Fixed filters — single select
+  fixedFilters.forEach(f => {
+    const btn = document.createElement("button");
+    btn.className = "fbtn" + (activeStatusLabels.size === 0 && f.label === activeFixedFilter ? " on" : "");
+    btn.textContent = f.label;
+    btn.dataset.group = "fixed";
+    btn.onclick = () => { setFixedFilter(f.label); rebuildStatusFilters(); render(); };
+    bar.appendChild(btn);
+  });
+
+  if (!liveStatusFilters.length) return;
+
+  // Divider
+  const div = document.createElement("span");
+  div.className = "toolbar-divider"; div.style.margin = "0 2px";
+  bar.appendChild(div);
+
+  // Label
+  const lbl = document.createElement("span");
+  lbl.style.cssText = "font-size:11px;color:#999;white-space:nowrap;align-self:center;";
+  lbl.textContent = "Status:";
+  bar.appendChild(lbl);
+
+  // Live status — multi-select
+  liveStatusFilters.forEach(f => {
+    const btn = document.createElement("button");
+    const isOn = activeStatusLabels.has(f.label);
+    btn.className = "fbtn" + (isOn ? " on" : "");
+    btn.textContent = f.label;
+    btn.dataset.group = "live";
+    btn.onclick = () => { toggleStatusLabel(f.label); rebuildStatusFilters(); render(); };
+    bar.appendChild(btn);
+  });
+}
+
+function billPassesFilter(b) {
+  // If live status filters are selected, only match those
+  if (activeStatusLabels.size > 0) {
     const live = liveData[b.id];
-    const statusLabel = live ? live.label : b.stage;
-    const statusCls   = live ? live.cls   : "b-passed";
-    const link = live && live.url
-      ? `<a class="live-link" href="${live.url}" target="_blank" style="font-size:11px;">leginfo ↗</a>` : "";
-    const hasNote = !!(notesData[b.id] && notesData[b.id].length > 0);
-    return `<div class="enacted-card">
-      <span class="enacted-id">${b.id}${hasNote ? '<span class="note-dot" title="Has notes"></span>' : ""}</span>
-      <div>
-        <div class="enacted-subj">${b.subj} ${catTag(b.cat)}</div>
-        <div class="enacted-desc">${b.desc}</div>
-        ${notesRow(b)}
-      </div>
-      <div class="enacted-meta">
-        ${chamberBadge(b.chamber)}
-        <span class="badge ${statusCls}">${statusLabel}</span>
-        ${link}
-      </div>
-    </div>`;
-  }).join("");
-
-  el.innerHTML = `<div class="enacted-section${isOpen ? " open" : ""}" id="enacted-wrap">
-    <div class="enacted-header" onclick="toggleEnacted()">
-      <h2>✓ Enacted Bills</h2>
-      <span class="enacted-count">${enacted.length}</span>
-      <svg class="enacted-chevron" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="enacted-body">${rows}</div>
-  </div>`;
+    const stage = live ? live.label : b.stage;
+    return activeStatusLabels.has(stage);
+  }
+  // Otherwise use the fixed filter
+  const ff = fixedFilters.find(f => f.label === activeFixedFilter) || fixedFilters[0];
+  return ff.fn(b);
 }
 
-function toggleEnacted() {
-  const wrap = document.getElementById("enacted-wrap");
-  if (wrap) wrap.classList.toggle("open");
+function billIsDimmed(b) {
+  // When live status filters are active, dim bills that don't match
+  if (activeStatusLabels.size > 0) {
+    const live = liveData[b.id];
+    const stage = live ? live.label : b.stage;
+    return !activeStatusLabels.has(stage);
+  }
+  return false;
 }
 
 function render() {
   const q = searchVal.toLowerCase();
-  const filtered = bills.filter(b => {
-    const sf = statusFilters.find(f => f.label === currentStatus);
-    if (!sf.fn(b)) return false;
+
+  // When live status filters are active, show ALL bills but dim non-matching ones
+  // When fixed filter is active, hide non-matching bills
+  const usingLiveFilter = activeStatusLabels.size > 0;
+
+  let displayed = bills.filter(b => {
     if (currentCat !== "All" && b.cat !== currentCat) return false;
-    if (q) return b.id.toLowerCase().includes(q) || b.subj.toLowerCase().includes(q) || b.desc.toLowerCase().includes(q);
+    if (q && !(b.id.toLowerCase().includes(q) || b.subj.toLowerCase().includes(q) || b.desc.toLowerCase().includes(q))) return false;
+    if (!usingLiveFilter && !billPassesFilter(b)) return false;
     return true;
   }).sort((a, b) => {
-    const ra = a.sandag === "Inactive" ? 10 : a.sandag === null ? 5 : 0;
-    const rb = b.sandag === "Inactive" ? 10 : b.sandag === null ? 5 : 0;
-    if (ra !== rb) return ra - rb;
+    // When live filter active: matching bills first, then dimmed
+    if (usingLiveFilter) {
+      const da = billIsDimmed(a) ? 1 : 0;
+      const db = billIsDimmed(b) ? 1 : 0;
+      if (da !== db) return da - db;
+    } else {
+      const ra = a.sandag === "Inactive" ? 10 : a.sandag === null ? 5 : 0;
+      const rb = b.sandag === "Inactive" ? 10 : b.sandag === null ? 5 : 0;
+      if (ra !== rb) return ra - rb;
+    }
     return stageRank(effectiveStage(a)) - stageRank(effectiveStage(b));
   });
 
+  const matching = usingLiveFilter ? displayed.filter(b => !billIsDimmed(b)).length : displayed.length;
+
   const list = document.getElementById("bill-list");
-  list.innerHTML = filtered.length === 0
+  list.innerHTML = displayed.length === 0
     ? '<div class="no-results">No bills match your filters.</div>'
-    : filtered.map(b => {
-        const inactive  = b.sandag === "Inactive";
+    : displayed.map(b => {
+        const dimmed    = billIsDimmed(b);
+        const inactive  = !dimmed && liveIsInactive(b);
         const notSandag = b.sandag === null;
         const live      = liveData[b.id];
-        const changed   = live && live.label !== b.stage;
-        const hasNote    = !!(notesData[b.id] && notesData[b.id].length > 0);
+        const changed   = live && live.label !== b.stage && !liveIsInactive(b);
+        const hasNote   = !!(notesData[b.id] && notesData[b.id].length > 0);
         const hasHearing = hearingData.hasOwnProperty(b.id) && hearingData[b.id] !== null;
-        return `<div class="bill-card${inactive ? " is-inactive" : ""}${notSandag ? " not-sandag" : ""}${changed ? " live-changed" : ""}">
-          <span class="bill-id">${b.id}${hasNote ? '<span class="note-dot" title="Has notes"></span>' : ""}</span>
+        return `<div class="bill-card${dimmed?" is-inactive":""}${!dimmed&&inactive?" is-inactive":""}${notSandag&&!dimmed?" not-sandag":""}${changed&&!dimmed?" live-changed":""}">
+          <span class="bill-id">${b.id}${hasNote?'<span class="note-dot" title="Has notes"></span>':""}</span>
           <div class="bill-main">
             <div class="bill-top">
-              <span class="bill-subj${inactive ? " inactive-subj" : ""}">${b.subj}</span>
+              <span class="bill-subj${inactive?" inactive-subj":""}">${b.subj}</span>
               ${catTag(b.cat)}
-              ${hasHearing ? hearingRow(b) : ""}
+              ${hasHearing&&!dimmed ? hearingRow(b) : ""}
             </div>
             ${liveRow(b)}
-            <span class="bill-desc${notSandag ? " no-desc" : ""}">${b.desc}</span>
-            ${notesRow(b)}
+            <span class="bill-desc${notSandag?" no-desc":""}">${b.desc}</span>
+            ${dimmed ? "" : notesRow(b)}
           </div>
-          <div class="bill-badges">
-            ${chamberBadge(b.chamber)}
-            ${stageBadge(b)}
-          </div>
+          <div class="bill-badges">${chamberBadge(b.chamber)}${stageBadge(b)}</div>
         </div>`;
       }).join("");
 
-  document.getElementById("count-bar").textContent =
-    `Showing ${filtered.length} of ${bills.length} bills · ${Object.keys(liveData).length} with live LegiScan status`;
-  renderEnacted();
+  const liveCount = Object.keys(liveData).length;
+  document.getElementById("count-bar").textContent = usingLiveFilter
+    ? `Showing ${matching} matching · ${displayed.length - matching} dimmed · ${liveCount} with live status`
+    : `Showing ${displayed.length} of ${bills.length} bills · ${liveCount} with live LegiScan status`;
   updateStats();
 }
 
 function updateStats() {
-  const active   = bills.filter(b => b.sandag === "Active").length;
-  const inactive = bills.filter(b => b.sandag === "Inactive").length;
+  const active   = bills.filter(b => liveIsActive(b)).length;
+  const inactive = bills.filter(b => liveIsInactive(b)).length;
   const notSan   = bills.filter(b => b.sandag === null).length;
-  const enacted  = bills.filter(b => isEnacted(b)).length;
-  const floor    = bills.filter(b => {
-    const s = effectiveStage(b).toLowerCase();
-    return (s.includes("floor") || s.includes("passed")) && b.sandag !== "Inactive" && !isEnacted(b);
-  }).length;
+  const enacted  = bills.filter(b => { const s = effectiveStage(b).toLowerCase(); return s.includes("chaptered")||s.includes("signed")||s.includes("enrolled"); }).length;
+  const floor    = bills.filter(b => { const s = effectiveStage(b).toLowerCase(); return (s.includes("floor")||s.includes("passed")||s.includes("engrossed")) && !s.includes("chaptered") && !s.includes("signed") && !s.includes("enrolled"); }).length;
   document.getElementById("stats-bar").innerHTML = `
     <div class="stat"><div class="stat-n">${bills.length}</div><div class="stat-l">Total bills</div></div>
     <div class="stat"><div class="stat-n">${active}</div><div class="stat-l">Active</div></div>
-    <div class="stat"><div class="stat-n">${inactive}</div><div class="stat-l">Inactive (SANDAG)</div></div>
+    <div class="stat"><div class="stat-n">${inactive}</div><div class="stat-l">Inactive</div></div>
     <div class="stat"><div class="stat-n">${notSan}</div><div class="stat-l">Not in SANDAG</div></div>
     <div class="stat"><div class="stat-n">${floor}</div><div class="stat-l">On floor</div></div>
     <div class="stat" style="color:#145A32"><div class="stat-n" style="color:#145A32">${enacted}</div><div class="stat-l">Enacted</div></div>
   `;
 }
 
-// ── Filter buttons ────────────────────────────────────────────────────────────
-const statusBar = document.getElementById("status-filters");
-statusFilters.forEach(f => {
-  const btn = document.createElement("button");
-  btn.className = "fbtn" + (f.label === "All" ? " on" : "");
-  btn.textContent = f.label; btn.dataset.group = "status";
-  btn.onclick = () => {
-    currentStatus = f.label;
-    document.querySelectorAll("[data-group='status']").forEach(b => b.classList.toggle("on", b.textContent === f.label));
-    render();
-  };
-  statusBar.appendChild(btn);
-});
-
+// ── Build category filter buttons ─────────────────────────────────────────────
 const catBar = document.getElementById("cat-filters");
 const allCatBtn = document.createElement("button");
 allCatBtn.className = "fbtn on"; allCatBtn.textContent = "All categories"; allCatBtn.dataset.group = "cat";
-allCatBtn.onclick = () => {
-  currentCat = "All";
-  document.querySelectorAll("[data-group='cat']").forEach(b => b.classList.toggle("on", b === allCatBtn));
-  render();
-};
+allCatBtn.onclick = () => { currentCat = "All"; document.querySelectorAll("[data-group='cat']").forEach(b => b.classList.toggle("on", b===allCatBtn)); render(); };
 catBar.appendChild(allCatBtn);
 catFilterOrder.forEach(key => {
   const btn = document.createElement("button");
   btn.className = "fbtn"; btn.textContent = CAT[key].label; btn.dataset.group = "cat";
-  btn.onclick = () => {
-    currentCat = key;
-    document.querySelectorAll("[data-group='cat']").forEach(b => b.classList.toggle("on", b === btn));
-    render();
-  };
+  btn.onclick = () => { currentCat = key; document.querySelectorAll("[data-group='cat']").forEach(b => b.classList.toggle("on", b===btn)); render(); };
   catBar.appendChild(btn);
 });
 
@@ -916,6 +897,7 @@ document.getElementById("search").addEventListener("input", e => { searchVal = e
 // ── Boot ──────────────────────────────────────────────────────────────────────
 loadNotes();
 loadHearings();
+rebuildStatusFilters();
 render();
 syncAllBills();
 </script>
