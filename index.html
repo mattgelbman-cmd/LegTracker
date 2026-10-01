@@ -182,7 +182,7 @@
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
 const LEGISCAN_KEY = "e1b55064872be319c9599280021f5184";
-const CACHE_KEY    = "hsng_bills_legiscan_v6";
+const CACHE_KEY    = "hsng_bills_legiscan_v7";
 const NOTES_KEY    = "hsng_bills_comments_v1";
 const HEARING_KEY  = "hsng_bills_hearings_v1";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -518,25 +518,40 @@ function formatAge(ms) {
 // Parse a more accurate status from last_action text when progress code is stale
 function statusFromAction(lastAction, progressLabel, progressCls) {
   if (!lastAction) return { label: progressLabel, cls: progressCls };
-  const a = lastAction.toLowerCase();
+  const a = lastAction;
 
-  if (/chaptered by secretary of state/i.test(lastAction))
+  // Governor actions
+  if (/chaptered by secretary of state/i.test(a))
     return { label: "Chaptered", cls: "b-signed" };
-  if (/signed by (the )?governor/i.test(lastAction))
+  if (/approved by the governor/i.test(a) || /signed by (the )?governor/i.test(a))
     return { label: "Signed by Governor", cls: "b-signed" };
-  if (/enrolled and presented to the governor/i.test(lastAction))
-    return { label: "Enrolled", cls: "b-engrossed" };
-  if (/enrolled/i.test(lastAction))
-    return { label: "Enrolled", cls: "b-engrossed" };
-  if (/vetoed by (the )?governor/i.test(lastAction))
+  if (/vetoed by (the )?governor/i.test(a))
     return { label: "Vetoed", cls: "b-vetoed" };
-  if (/failed (the )?passage/i.test(lastAction) || /died/i.test(lastAction))
+
+  // Enrollment
+  if (/enrolled and presented to the governor/i.test(a) || /enrolled/i.test(a))
+    return { label: "Enrolled", cls: "b-engrossed" };
+
+  // Failed / dead
+  if (/failed (the )?passage/i.test(a))
     return { label: "Failed", cls: "b-inactive" };
-  if (/read third time.*passed/i.test(lastAction) || /passed.*third reading/i.test(lastAction))
+  if (/died/i.test(a) || /\bdead\b/i.test(a))
+    return { label: "Failed", cls: "b-inactive" };
+  // Bills that didn't make it off the suspense file or out of committee by deadline
+  if (/held under submission/i.test(a))
+    return { label: "Failed – Suspense", cls: "b-inactive" };
+  if (/from committee without further action/i.test(a))
+    return { label: "Failed – Committee", cls: "b-inactive" };
+  // "Not adopted" / "not passed" / "not concurred"
+  if (/not adopted/i.test(a) || /not passed/i.test(a) || /not concurred/i.test(a))
+    return { label: "Failed", cls: "b-inactive" };
+
+  // Floor readings
+  if (/read third time.*passed/i.test(a) || /passed.*third reading/i.test(a))
     return { label: "Passed – Third Reading", cls: "b-passed" };
-  if (/read third time/i.test(lastAction))
+  if (/read third time/i.test(a))
     return { label: "Floor – Third Reading", cls: "b-floor" };
-  if (/read second time/i.test(lastAction))
+  if (/read second time/i.test(a))
     return { label: "Floor – Second Reading", cls: "b-floor" };
 
   // Fall back to progress code
@@ -791,75 +806,53 @@ function billPassesFilter(b) {
   return ff.fn(b);
 }
 
-function billIsDimmed(b) {
-  // When live status filters are active, dim bills that don't match
-  if (activeStatusLabels.size > 0) {
-    const live = liveData[b.id];
-    const stage = live ? live.label : b.stage;
-    return !activeStatusLabels.has(stage);
-  }
-  return false;
-}
 
 function render() {
   const q = searchVal.toLowerCase();
-
-  // When live status filters are active, show ALL bills but dim non-matching ones
-  // When fixed filter is active, hide non-matching bills
   const usingLiveFilter = activeStatusLabels.size > 0;
 
   let displayed = bills.filter(b => {
     if (currentCat !== "All" && b.cat !== currentCat) return false;
     if (q && !(b.id.toLowerCase().includes(q) || b.subj.toLowerCase().includes(q) || b.desc.toLowerCase().includes(q))) return false;
-    if (!usingLiveFilter && !billPassesFilter(b)) return false;
+    // Always apply the filter — hide non-matching bills regardless of filter type
+    if (!billPassesFilter(b)) return false;
     return true;
   }).sort((a, b) => {
-    // When live filter active: matching bills first, then dimmed
-    if (usingLiveFilter) {
-      const da = billIsDimmed(a) ? 1 : 0;
-      const db = billIsDimmed(b) ? 1 : 0;
-      if (da !== db) return da - db;
-    } else {
-      const ra = a.sandag === "Inactive" ? 10 : a.sandag === null ? 5 : 0;
-      const rb = b.sandag === "Inactive" ? 10 : b.sandag === null ? 5 : 0;
-      if (ra !== rb) return ra - rb;
-    }
+    const ra = a.sandag === "Inactive" ? 10 : a.sandag === null ? 5 : 0;
+    const rb = b.sandag === "Inactive" ? 10 : b.sandag === null ? 5 : 0;
+    if (ra !== rb) return ra - rb;
     return stageRank(effectiveStage(a)) - stageRank(effectiveStage(b));
   });
-
-  const matching = usingLiveFilter ? displayed.filter(b => !billIsDimmed(b)).length : displayed.length;
 
   const list = document.getElementById("bill-list");
   list.innerHTML = displayed.length === 0
     ? '<div class="no-results">No bills match your filters.</div>'
     : displayed.map(b => {
-        const dimmed    = billIsDimmed(b);
-        const inactive  = !dimmed && liveIsInactive(b);
-        const notSandag = b.sandag === null;
-        const live      = liveData[b.id];
-        const changed   = live && live.label !== b.stage && !liveIsInactive(b);
-        const hasNote   = !!(notesData[b.id] && notesData[b.id].length > 0);
+        const inactive   = liveIsInactive(b);
+        const notSandag  = b.sandag === null;
+        const live       = liveData[b.id];
+        const changed    = live && live.label !== b.stage && !liveIsInactive(b);
+        const hasNote    = !!(notesData[b.id] && notesData[b.id].length > 0);
         const hasHearing = hearingData.hasOwnProperty(b.id) && hearingData[b.id] !== null;
-        return `<div class="bill-card${dimmed?" is-inactive":""}${!dimmed&&inactive?" is-inactive":""}${notSandag&&!dimmed?" not-sandag":""}${changed&&!dimmed?" live-changed":""}">
+        return `<div class="bill-card${inactive?" is-inactive":""}${notSandag?" not-sandag":""}${changed?" live-changed":""}">
           <span class="bill-id">${b.id}${hasNote?'<span class="note-dot" title="Has notes"></span>':""}</span>
           <div class="bill-main">
             <div class="bill-top">
               <span class="bill-subj${inactive?" inactive-subj":""}">${b.subj}</span>
               ${catTag(b.cat)}
-              ${hasHearing&&!dimmed ? hearingRow(b) : ""}
+              ${hasHearing ? hearingRow(b) : ""}
             </div>
             ${liveRow(b)}
             <span class="bill-desc${notSandag?" no-desc":""}">${b.desc}</span>
-            ${dimmed ? "" : notesRow(b)}
+            ${notesRow(b)}
           </div>
           <div class="bill-badges">${chamberBadge(b.chamber)}${stageBadge(b)}</div>
         </div>`;
       }).join("");
 
   const liveCount = Object.keys(liveData).length;
-  document.getElementById("count-bar").textContent = usingLiveFilter
-    ? `Showing ${matching} matching · ${displayed.length - matching} dimmed · ${liveCount} with live status`
-    : `Showing ${displayed.length} of ${bills.length} bills · ${liveCount} with live LegiScan status`;
+  document.getElementById("count-bar").textContent =
+    `Showing ${displayed.length} of ${bills.length} bills · ${liveCount} with live LegiScan status`;
   updateStats();
 }
 
